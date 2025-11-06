@@ -75,7 +75,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 href="https://instagram.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
                 data-testid="link-instagram"
               >
                 <img src={instagramIcon} alt="Instagram" className="h-6 w-6" />
@@ -85,7 +85,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 href="https://facebook.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
                 data-testid="link-facebook"
               >
                 <img src={facebookIcon} alt="Facebook" className="h-6 w-6" />
@@ -95,7 +95,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 href="https://wa.me/915555555555" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity group"
+                className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity group"
                 data-testid="link-whatsapp"
               >
                 <SiWhatsapp className="h-6 w-6 text-green-600" />
