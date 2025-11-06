@@ -113,15 +113,15 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             </a>
           </div>
 
-          <div className="flex items-center justify-end gap-3">
-            <div className="hidden md:flex items-center relative max-w-xs">
-              <Search className="absolute left-3 h-5 w-5 text-gray-400" />
+          <div className="flex items-center justify-end gap-4">
+            <div className="hidden md:flex items-center relative">
+              <Search className="absolute left-4 h-6 w-6 text-gray-400" />
               <Input
                 type="search"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-64 bg-gray-50 border-gray-200 rounded-full focus:bg-white transition-colors"
+                className="pl-12 pr-6 py-3 w-80 text-base bg-gray-50 border-gray-200 rounded-full focus:bg-white transition-colors"
                 data-testid="input-search"
               />
             </div>
@@ -129,8 +129,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-gray-100" data-testid="button-account">
-                    <User className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-gray-100" data-testid="button-account">
+                    <User className="h-7 w-7" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -155,13 +155,13 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="ghost" size="icon" className="hover:bg-gray-100" onClick={() => setLocation("/login")} data-testid="button-login">
-                <User className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="h-11 w-11 hover:bg-gray-100" onClick={() => setLocation("/login")} data-testid="button-login">
+                <User className="h-7 w-7" />
               </Button>
             )}
             
-            <Button variant="ghost" size="icon" className="relative hover:bg-gray-100" onClick={() => setLocation("/wishlist")} data-testid="button-wishlist">
-              <Heart className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-gray-100" onClick={() => setLocation("/wishlist")} data-testid="button-wishlist">
+              <Heart className="h-7 w-7" />
               {wishlistCount > 0 && (
                 <Badge 
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
@@ -172,8 +172,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               )}
             </Button>
             
-            <Button variant="ghost" size="icon" className="relative hover:bg-gray-100" onClick={() => setLocation("/cart")} data-testid="button-bag">
-              <ShoppingBag className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-gray-100" onClick={() => setLocation("/cart")} data-testid="button-bag">
+              <ShoppingBag className="h-7 w-7" />
               {actualCartCount > 0 && (
                 <Badge 
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
