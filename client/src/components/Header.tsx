@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logoImage from "@assets/image-removebg-preview (6)_1762438998990.png";
+import logoImage from "@assets/PNG__B_ LOGO_1762442171742.png";
 
 interface HeaderProps {
   cartCount?: number;
