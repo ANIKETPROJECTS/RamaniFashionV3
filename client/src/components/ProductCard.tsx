@@ -78,13 +78,8 @@ export default function ProductCard({
           <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current' : ''}`} />
         </Button>
 
-        {(isNew || isBestseller || discount) && (
+        {(isBestseller || discount) && (
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {isNew && (
-              <Badge className="bg-primary" data-testid={`badge-new-${id}`}>
-                New
-              </Badge>
-            )}
             {isBestseller && (
               <Badge className="bg-accent text-accent-foreground" data-testid={`badge-bestseller-${id}`}>
                 Bestseller
@@ -111,10 +106,6 @@ export default function ProductCard({
       </div>
 
       <CardContent className="p-4">
-        <h3 className="font-medium text-sm mb-2 line-clamp-2" data-testid={`text-product-name-${id}`}>
-          {name}
-        </h3>
-        
         {rating > 0 && (
           <div className="flex items-center gap-1 mb-2">
             <div className="flex">
@@ -131,14 +122,25 @@ export default function ProductCard({
           </div>
         )}
 
+        <h3 className="font-medium text-sm mb-2 line-clamp-2" data-testid={`text-product-name-${id}`}>
+          {name}
+        </h3>
+
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold text-primary" data-testid={`text-price-${id}`}>
             ₹{price.toLocaleString()}
           </span>
           {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through" data-testid={`text-original-price-${id}`}>
-              ₹{originalPrice.toLocaleString()}
-            </span>
+            <>
+              <span className="text-sm text-muted-foreground line-through" data-testid={`text-original-price-${id}`}>
+                ₹{originalPrice.toLocaleString()}
+              </span>
+              {discount !== undefined && discount > 0 && (
+                <span className="text-xs text-green-600 font-medium" data-testid={`text-discount-${id}`}>
+                  {discount}% off
+                </span>
+              )}
+            </>
           )}
         </div>
       </CardContent>

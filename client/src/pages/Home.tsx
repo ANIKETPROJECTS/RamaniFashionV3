@@ -23,11 +23,11 @@ import pinkHeroImage from "@assets/generated_images/Pink_silk_saree_hero_a644da4
 export default function Home() {
   const [, setLocation] = useLocation();
 
-  const { data: productsData } = useQuery({
-    queryKey: ["/api/products?limit=4"],
+  const { data: newArrivalsData } = useQuery({
+    queryKey: ["/api/products?isNew=true&limit=6"],
   });
 
-  const products = (productsData as any)?.products || [];
+  const newArrivals = (newArrivalsData as any)?.products || [];
 
   const categories = [
     { name: "Silk Sarees", image: bridalImage, itemCount: 156, category: "Silk Sarees" },
@@ -128,27 +128,36 @@ export default function Home() {
         <HeroCarousel />
 
         <section className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="text-3xl font-bold text-center mb-4">Your Shaadi Wardrobe</h2>
-          <p className="text-center text-muted-foreground mb-8">Curated collections for every celebration</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {collections.map((collection) => (
-              <Card
-                key={collection.title}
-                className="overflow-hidden cursor-pointer hover-elevate active-elevate-2 group"
-                onClick={() => setLocation(collection.link)}
-              >
-                <div className="aspect-square relative overflow-hidden">
-                  <img
-                    src={collection.image}
-                    alt={collection.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-center">
-                    <h3 className="text-lg font-semibold">{collection.title}</h3>
-                  </div>
-                </div>
-              </Card>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold" data-testid="text-section-new-arrivals-home">
+              New Arrival
+            </h2>
+            <button
+              onClick={() => setLocation("/new-arrivals")}
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              data-testid="button-view-all-new-arrivals"
+            >
+              View All
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {newArrivals.slice(0, 6).map((product: any) => (
+              <ProductCard
+                key={product._id}
+                id={product._id}
+                name={product.name}
+                image={product.images?.[0] || "/placeholder.jpg"}
+                price={product.price}
+                originalPrice={product.originalPrice}
+                discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
+                rating={product.rating}
+                reviewCount={product.reviewCount}
+                isNew={product.isNew}
+                isBestseller={product.isBestseller}
+                onClick={() => setLocation(`/product/${product._id}`)}
+                onAddToCart={() => {}}
+                onAddToWishlist={() => {}}
+              />
             ))}
           </div>
         </section>
@@ -213,36 +222,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold" data-testid="text-section-new-arrivals">
-              New Arrivals
-            </h2>
-            <a href="/new-arrivals" className="text-primary hover:underline" data-testid="link-view-all-new">
-              View All →
-            </a>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.slice(0, 4).map((product: any) => (
-              <ProductCard
-                key={product._id}
-                id={product._id}
-                name={product.name}
-                image={product.images?.[0] || "/placeholder.jpg"}
-                price={product.price}
-                originalPrice={product.originalPrice}
-                discount={product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0}
-                rating={product.rating}
-                reviewCount={product.reviewCount}
-                isNew={product.isNew}
-                isBestseller={product.isBestseller}
-                onClick={() => setLocation(`/product/${product._id}`)}
-                onAddToCart={() => {}}
-                onAddToWishlist={() => {}}
-              />
-            ))}
-          </div>
-        </section>
 
         <section className="max-w-7xl mx-auto px-4 py-12">
           <h2 className="text-3xl font-bold text-center mb-8" data-testid="text-section-occasions">

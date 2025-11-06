@@ -14,6 +14,7 @@ import Occasions from "@/pages/Occasions";
 import Collections from "@/pages/Collections";
 import AboutUs from "@/pages/AboutUs";
 import Sale from "@/pages/Sale";
+import NewArrivals from "@/pages/NewArrivals";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,7 +27,7 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/login" component={Login} />
       <Route path="/categories" component={Products} />
-      <Route path="/new-arrivals" component={Products} />
+      <Route path="/new-arrivals" component={NewArrivals} />
       <Route path="/occasions" component={Occasions} />
       <Route path="/collections" component={Collections} />
       <Route path="/about" component={AboutUs} />
