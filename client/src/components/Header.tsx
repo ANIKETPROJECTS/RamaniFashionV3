@@ -1,4 +1,5 @@
-import { ShoppingCart, Heart, User, Search, Menu, LogOut } from "lucide-react";
+import { ShoppingBag, Heart, User, Search, Menu, LogOut } from "lucide-react";
+import { SiInstagram, SiFacebook, SiWhatsapp } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -55,16 +56,48 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between gap-4">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="md:hidden"
-            onClick={onMenuClick}
-            data-testid="button-menu"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="md:hidden"
+              onClick={onMenuClick}
+              data-testid="button-menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+
+            <div className="hidden md:flex items-center gap-3">
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-pink-600 hover:text-pink-700 transition-colors"
+                data-testid="link-instagram"
+              >
+                <SiInstagram className="h-5 w-5" />
+              </a>
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-blue-600 hover:text-blue-700 transition-colors"
+                data-testid="link-facebook"
+              >
+                <SiFacebook className="h-5 w-5" />
+              </a>
+              <a 
+                href="https://wa.me" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-green-600 hover:text-green-700 transition-colors"
+                data-testid="link-whatsapp"
+              >
+                <SiWhatsapp className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
 
           <div className="flex-1 flex items-center justify-center">
             <a href="/" className="flex items-center justify-center">
@@ -77,12 +110,24 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             </a>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center relative max-w-xs">
+              <Search className="absolute left-3 h-5 w-5 text-gray-400" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 w-64 bg-gray-50 border-gray-200 rounded-full focus:bg-white transition-colors"
+                data-testid="input-search"
+              />
+            </div>
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" data-testid="button-account">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="hover:bg-gray-100" data-testid="button-account">
+                    <User className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -107,13 +152,13 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="ghost" size="icon" onClick={() => setLocation("/login")} data-testid="button-login">
-                <User className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="hover:bg-gray-100" onClick={() => setLocation("/login")} data-testid="button-login">
+                <User className="h-6 w-6" />
               </Button>
             )}
             
-            <Button variant="ghost" size="icon" className="relative" onClick={() => setLocation("/wishlist")} data-testid="button-wishlist">
-              <Heart className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative hover:bg-gray-100" onClick={() => setLocation("/wishlist")} data-testid="button-wishlist">
+              <Heart className="h-6 w-6" />
               {wishlistCount > 0 && (
                 <Badge 
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
@@ -124,8 +169,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               )}
             </Button>
             
-            <Button variant="ghost" size="icon" className="relative" onClick={() => setLocation("/cart")} data-testid="button-cart">
-              <ShoppingCart className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative hover:bg-gray-100" onClick={() => setLocation("/cart")} data-testid="button-bag">
+              <ShoppingBag className="h-6 w-6" />
               {actualCartCount > 0 && (
                 <Badge 
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
@@ -141,14 +186,12 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
 
       <nav className="hidden md:block border-t bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-center justify-center gap-8 py-3 text-sm">
-            <li><a href="/" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-home">Home</a></li>
-            <li><a href="/new-arrivals" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-new-arrivals">New Arrivals</a></li>
-            <li><a href="/categories" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-categories">Categories</a></li>
-            <li><a href="/occasions" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-occasions">Occasions</a></li>
-            <li><a href="/collections" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-collections">Collections</a></li>
-            <li><a href="/sale" className="text-destructive hover-elevate px-3 py-2 rounded-md" data-testid="link-sale">Sale</a></li>
-            <li><a href="/about" className="hover-elevate px-3 py-2 rounded-md" data-testid="link-about">About Us</a></li>
+          <ul className="flex items-center justify-center gap-12 py-4 text-base font-medium">
+            <li><a href="/" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-home">HOME</a></li>
+            <li><a href="/new-arrivals" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-new-arrivals">NEW ARRIVALS</a></li>
+            <li><a href="/categories" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-categories">CATEGORIES</a></li>
+            <li><a href="/sale" className="text-destructive hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-sale">SALE</a></li>
+            <li><a href="/about" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-about">ABOUT US</a></li>
           </ul>
         </div>
       </nav>
