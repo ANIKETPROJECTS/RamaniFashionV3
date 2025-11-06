@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import bannerImage from "@assets/Pink and Gold Gradient Decorative Woman Wonderful Indian YouTube Thumbnail_1762440973562.png";
+import bannerImage from "@assets/Pink and Gold Gradient Decorative Woman Wonderful Indian YouTube Thumbnail (1)_1762443213141.png";
 
 const slides = [
   {
