@@ -56,8 +56,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
+        <div className="grid grid-cols-3 items-center gap-6">
+          <div className="flex items-start gap-3">
             <Button
               size="icon"
               variant="ghost"
@@ -68,38 +68,41 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
               <Menu className="h-5 w-5" />
             </Button>
 
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex flex-col gap-2">
               <a 
-                href="https://instagram.com" 
+                href="https://instagram.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-pink-600 hover:text-pink-700 transition-colors"
+                className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition-colors group"
                 data-testid="link-instagram"
               >
-                <SiInstagram className="h-5 w-5" />
+                <SiInstagram className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">@ramanifashion</span>
               </a>
               <a 
-                href="https://facebook.com" 
+                href="https://facebook.com/ramanifashion" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-blue-600 hover:text-blue-700 transition-colors"
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors group"
                 data-testid="link-facebook"
               >
-                <SiFacebook className="h-5 w-5" />
+                <SiFacebook className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">@ramanifashion</span>
               </a>
               <a 
-                href="https://wa.me" 
+                href="https://wa.me/915555555555" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-green-600 hover:text-green-700 transition-colors"
+                className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors group"
                 data-testid="link-whatsapp"
               >
-                <SiWhatsapp className="h-5 w-5" />
+                <SiWhatsapp className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">+91 5555555555</span>
               </a>
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <a href="/" className="flex items-center justify-center">
               <img 
                 src={logoImage}
@@ -110,7 +113,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             </a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-end gap-3">
             <div className="hidden md:flex items-center relative max-w-xs">
               <Search className="absolute left-3 h-5 w-5 text-gray-400" />
               <Input
