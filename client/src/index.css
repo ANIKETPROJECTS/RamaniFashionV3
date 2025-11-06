@@ -76,9 +76,10 @@
   --chart-4: 28 70% 62%;
   --chart-5: 340 60% 38%;
 
-  --font-sans: Open Sans, sans-serif;
-  --font-serif: Georgia, serif;
+  --font-sans: 'Poppins', sans-serif;
+  --font-serif: 'Playfair Display', serif;
   --font-mono: Menlo, monospace;
+  --font-script: 'Great Vibes', cursive;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.02);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.03);

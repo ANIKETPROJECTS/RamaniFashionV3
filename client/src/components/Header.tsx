@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import logoImage from "@assets/image-removebg-preview (6)_1762438998990.png";
 
 interface HeaderProps {
   cartCount?: number;
@@ -69,10 +70,13 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             <Menu className="h-5 w-5" />
           </Button>
 
-          <a href="/" className="flex items-center">
-            <h1 className="font-script text-2xl md:text-3xl font-bold text-primary" data-testid="text-logo">
-              Ramani Fashion
-            </h1>
+          <a href="/" className="flex items-center justify-center">
+            <img 
+              src={logoImage}
+              alt="Ramani Fashion" 
+              className="h-12 md:h-16 w-auto object-contain"
+              data-testid="img-logo"
+            />
           </a>
 
           <div className="hidden md:flex flex-1 max-w-md mx-8">
