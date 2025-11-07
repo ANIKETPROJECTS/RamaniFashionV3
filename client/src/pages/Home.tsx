@@ -15,6 +15,7 @@ import casualImage from "@assets/generated_images/Casual_linen_saree_030a208d.pn
 import banarasiImage from "@assets/generated_images/Banarasi_saree_detail_604e6fdd.png";
 import festiveImage from "@assets/generated_images/Festive_collection_banner_7a822710.png";
 import customerImage from "@assets/generated_images/Customer_testimonial_portrait_6ffe6534.png";
+import ramaniBanner from "@/assets/ramani-banner.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -128,6 +129,16 @@ export default function Home() {
                 />
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="max-w-7xl mx-auto px-4 py-8">
+          <div className="w-full overflow-hidden rounded-lg">
+            <img 
+              src={ramaniBanner} 
+              alt="Ramani Fashion - Shop the authentic Silk Sarees, crafted with perfection by local artisans" 
+              className="w-full h-auto object-cover"
+            />
           </div>
         </section>
 
