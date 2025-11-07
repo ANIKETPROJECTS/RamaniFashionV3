@@ -333,7 +333,7 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <h3 className="text-center text-base md:text-lg font-semibold text-foreground">
+                <h3 className="text-center text-base md:text-lg font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-6 py-2 inline-block">
                   {category.name}
                 </h3>
               </div>
