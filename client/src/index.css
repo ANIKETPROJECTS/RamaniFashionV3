@@ -390,3 +390,15 @@
   display: inline-flex !important;
   align-items: center !important;
 }
+
+/* Cylindrical form fields */
+#contact input,
+#contact textarea,
+#contact select,
+#contact button[type="submit"] {
+  border-radius: 50px !important;
+}
+
+#contact textarea {
+  border-radius: 30px !important;
+}

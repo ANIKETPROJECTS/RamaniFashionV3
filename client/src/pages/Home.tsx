@@ -178,6 +178,9 @@ export default function Home() {
     banarasiImage,
     paithaniImage,
     khunIrkalImage,
+    bridalImage,
+    festiveImage,
+    partyImage,
   ];
 
   const customerReviews = [
@@ -452,18 +455,20 @@ export default function Home() {
         <section id="contact" className="py-16 bg-background">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">Get In Touch</h2>
+              <h2 className="text-3xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block mb-4">Get In Touch</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 We'd love to hear from you! Whether you have a question about our products, need assistance, or just want to share your feedback.
               </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-              <Card className="lg:col-span-3 border shadow-sm h-full" data-testid="card-contact-form">
+              <Card className="lg:col-span-3 border shadow-sm h-full" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }} data-testid="card-contact-form">
                 <CardContent className="p-8 h-full flex flex-col">
-                  <h3 className="text-2xl font-bold mb-8 text-foreground">
-                    Send Us a Message
-                  </h3>
+                  <div className="flex justify-center mb-8">
+                    <h3 className="text-2xl font-bold font-serif bg-primary text-white border-2 border-white rounded-full px-8 py-3 inline-block">
+                      Send Us a Message
+                    </h3>
+                  </div>
                   <Form {...contactForm}>
                     <form onSubmit={contactForm.handleSubmit(onContactSubmit)} className="space-y-6 flex-1 flex flex-col">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -633,29 +638,29 @@ export default function Home() {
                 </Card>
 
                 <Card className="border shadow-sm hover:shadow-md transition-shadow" data-testid="card-contact-info">
-                  <CardContent className="p-6 space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                        <MapPin className="w-5 h-5 text-foreground" />
+                  <CardContent className="p-6 space-y-4">
+                    <div className="rounded-full p-4 flex items-center gap-4" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(338, 78%, 62%)' }}>
+                        <MapPin className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed" data-testid="text-address">
+                        <p className="text-sm text-foreground leading-relaxed" data-testid="text-address">
                           Shop No. 15, Ground Floor, Kalpataru Complex,<br />
                           Near City Mall, Nashik, Maharashtra 422001
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-foreground" />
+                    <div className="rounded-full p-4 flex items-center gap-4" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(338, 78%, 62%)' }}>
+                        <Phone className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Phone</h3>
                         <a 
                           href="tel:+915555555555" 
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          className="text-sm text-foreground hover:text-foreground/80 transition-colors"
                           data-testid="link-phone"
                         >
                           +91 5555555555
@@ -663,15 +668,15 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                        <Mail className="w-5 h-5 text-foreground" />
+                    <div className="rounded-full p-4 flex items-center gap-4" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(338, 78%, 62%)' }}>
+                        <Mail className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Email</h3>
                         <a 
                           href="mailto:info@ramanifashion.in" 
-                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          className="text-sm text-foreground hover:text-foreground/80 transition-colors"
                           data-testid="link-email"
                         >
                           info@ramanifashion.in
@@ -679,13 +684,13 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                        <Clock className="w-5 h-5 text-foreground" />
+                    <div className="rounded-full p-4 flex items-center gap-4" style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(338, 78%, 62%)' }}>
+                        <Clock className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1">Store Hours</h3>
-                        <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="text-sm text-foreground space-y-1">
                           <p data-testid="text-hours-weekday">Mon-Sat: 10 AM - 9 PM</p>
                           <p data-testid="text-hours-sunday">Sun: 11 AM - 8 PM</p>
                         </div>
