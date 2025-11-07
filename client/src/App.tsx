@@ -15,6 +15,9 @@ import Collections from "@/pages/Collections";
 import AboutUs from "@/pages/AboutUs";
 import Sale from "@/pages/Sale";
 import NewArrivals from "@/pages/NewArrivals";
+import Profile from "@/pages/Profile";
+import Orders from "@/pages/Orders";
+import Wishlist from "@/pages/Wishlist";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +35,9 @@ function Router() {
       <Route path="/collections" component={Collections} />
       <Route path="/about" component={AboutUs} />
       <Route path="/sale" component={Sale} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/orders" component={Orders} />
+      <Route path="/wishlist" component={Wishlist} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
