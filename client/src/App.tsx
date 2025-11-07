@@ -15,6 +15,7 @@ import Collections from "@/pages/Collections";
 import AboutUs from "@/pages/AboutUs";
 import Sale from "@/pages/Sale";
 import NewArrivals from "@/pages/NewArrivals";
+import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/collections" component={Collections} />
       <Route path="/about" component={AboutUs} />
       <Route path="/sale" component={Sale} />
+      <Route path="/contact" component={Contact} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>

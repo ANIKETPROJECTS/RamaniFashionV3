@@ -197,6 +197,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
             <li><a href="/categories" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-categories">CATEGORIES</a></li>
             <li><a href="/sale" className="text-destructive hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-sale">SALE</a></li>
             <li><a href="/about" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-about">ABOUT US</a></li>
+            <li><a href="/contact" className="hover-elevate px-4 py-2 rounded-md tracking-wide" data-testid="link-contact">CONTACT</a></li>
           </ul>
         </div>
       </nav>
