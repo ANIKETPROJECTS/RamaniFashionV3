@@ -207,8 +207,11 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 <a href="/new-arrivals" className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-new-arrivals">NEW ARRIVALS</a>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-trending-collection">
-                  TRENDING COLLECTION
+                <a href="/products?isTrending=true" className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-trending-collection">TRENDING COLLECTION</a>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-categories">
+                  CATEGORIES
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[300px] p-4">
@@ -279,9 +282,6 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                     </ul>
                   </div>
                 </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <a href="/categories" className="hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-categories">CATEGORIES</a>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <a href="/sale" className="text-destructive hover-elevate px-4 py-2 rounded-md tracking-wide text-base font-medium" data-testid="link-sale">SALE</a>
