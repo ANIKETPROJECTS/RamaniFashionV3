@@ -476,6 +476,7 @@ export default function NewArrivals() {
                           reviewCount={product.reviewCount}
                           isNew={product.isNew}
                           isBestseller={product.isBestseller}
+                          context="new-arrivals"
                         />
                       </motion.div>
                     );

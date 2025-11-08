@@ -473,6 +473,7 @@ export default function Products() {
                           reviewCount={product.reviewCount}
                           isNew={product.isNew}
                           isBestseller={product.isBestseller}
+                          context="products"
                         />
                       </motion.div>
                     );

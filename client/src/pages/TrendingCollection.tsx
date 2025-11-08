@@ -477,6 +477,7 @@ export default function TrendingCollection() {
                           reviewCount={product.reviewCount}
                           isNew={product.isNew}
                           isBestseller={product.isBestseller}
+                          context="trending"
                         />
                       </motion.div>
                     );
