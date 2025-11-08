@@ -340,7 +340,7 @@ export default function Home() {
                 </h2>
               </div>
               <button
-                onClick={() => setLocation("/products?isTrending=true")}
+                onClick={() => setLocation("/trending-collection")}
                 className="px-6 md:px-8 py-2 md:py-3 bg-primary text-white border-2 border-white rounded-full hover:bg-primary/90 transition-colors font-bold text-sm md:text-base self-center sm:self-auto"
                 data-testid="button-view-all-trending"
               >
