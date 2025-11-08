@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Award, Heart, Shield, Truck } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function AboutUs() {
   const features = [
@@ -27,25 +28,62 @@ export default function AboutUs() {
     }
   ];
 
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main>
-        <section className="bg-primary/5 py-16">
+        <motion.section 
+          className="bg-primary/5 py-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold mb-6">About Ramani Fashion</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <motion.h1 
+              className="text-4xl font-bold mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              About Ramani Fashion
+            </motion.h1>
+            <motion.p 
+              className="text-lg text-muted-foreground leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               Welcome to Ramani Fashion, your premier destination for exquisite sarees that celebrate 
               Indian tradition and contemporary style. For years, we've been dedicated to bringing you 
               the finest collection of sarees from across India.
-            </p>
+            </motion.p>
           </div>
-        </section>
+        </motion.section>
 
         <section className="max-w-7xl mx-auto px-4 py-16">
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+            >
               <h2 className="text-3xl font-bold mb-4">Our Story</h2>
               <p className="text-muted-foreground mb-4">
                 Ramani Fashion was born from a passion for preserving and promoting the rich heritage 
@@ -57,30 +95,52 @@ export default function AboutUs() {
                 represents the diversity and beauty of Indian craftsmanship. Each piece is carefully 
                 selected to ensure it meets our high standards of quality and style.
               </p>
-            </div>
-            <div className="aspect-square rounded-lg overflow-hidden">
+            </motion.div>
+            <motion.div 
+              className="aspect-square rounded-lg overflow-hidden"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+            >
               <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                 <p className="text-6xl font-script text-primary">Ramani Fashion</p>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center mb-12">Why Choose Us</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature) => {
+            <motion.h2 
+              className="text-3xl font-bold text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              Why Choose Us
+            </motion.h2>
+            <motion.div 
+              className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+            >
+              {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <Card key={feature.title} className="p-6 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                      <Icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </Card>
+                  <motion.div key={feature.title} variants={fadeInUp} transition={{ duration: 0.5 }}>
+                    <Card className="p-6 text-center h-full">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                        <Icon className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </Card>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         </section>
       </main>

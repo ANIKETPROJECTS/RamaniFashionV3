@@ -5,8 +5,8 @@ import facebookIcon from "@assets/communication_1762445935759.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect, type MouseEvent } from "react";
+import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import {
@@ -62,6 +62,17 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
     setLocation("/");
   };
 
+  const handleContactClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLocation("/");
+    setTimeout(() => {
+      const contactSection = document.getElementById("contact");
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
       <div className="max-w-7xl mx-auto px-4 py-2">
@@ -112,14 +123,14 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
           </div>
 
           <div className="flex items-center justify-center">
-            <a href="/" className="flex items-center justify-center">
+            <Link href="/" className="flex items-center justify-center">
               <img 
                 src={logoImage}
                 alt="Ramani Fashion" 
                 className="h-16 md:h-18 lg:h-20 w-auto object-contain"
                 data-testid="img-logo"
               />
-            </a>
+            </Link>
           </div>
 
           <div className="flex items-center justify-end gap-6">
@@ -201,13 +212,13 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
           <NavigationMenu className="mx-auto">
             <NavigationMenuList className="flex items-center justify-center gap-8 py-2">
               <NavigationMenuItem>
-                <a href="/" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-home">HOME</a>
+                <Link href="/" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-home">HOME</Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <a href="/new-arrivals" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-new-arrivals">NEW ARRIVALS</a>
+                <Link href="/new-arrivals" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-new-arrivals">NEW ARRIVALS</Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <a href="/products?isTrending=true" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-trending-collection">TRENDING COLLECTION</a>
+                <Link href="/products?isTrending=true" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-trending-collection">TRENDING COLLECTION</Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="px-4 py-2 tracking-wide text-base font-medium bg-transparent hover:bg-transparent data-[state=open]:bg-transparent" data-testid="link-categories">
@@ -217,80 +228,80 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                   <div className="w-[250px] p-3">
                     <ul className="grid gap-2">
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Jamdani Paithani"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-jamdani-paithani"
                         >
                           <div className="text-sm font-medium leading-none text-black">Jamdani Paithani</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Khun Irkal"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-khun-irkal"
                         >
                           <div className="text-sm font-medium leading-none text-black">Khun / Irkal (Ilkal)</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Ajrakh Modal"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-ajrakh-modal"
                         >
                           <div className="text-sm font-medium leading-none text-black">Ajrakh Modal</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Mul Mul Cotton"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-mul-mul-cotton"
                         >
                           <div className="text-sm font-medium leading-none text-black">Mul Mul Cotton</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Khadi Cotton"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-khadi-cotton"
                         >
                           <div className="text-sm font-medium leading-none text-black">Khadi Cotton</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Patch Work"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-patch-work"
                         >
                           <div className="text-sm font-medium leading-none text-black">Patch Work</div>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href="/products?category=Pure Linen"
                           className="block select-none border border-black p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100"
                           data-testid="category-pure-linen"
                         >
                           <div className="text-sm font-medium leading-none text-black">Pure Linen</div>
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <a href="/sale" className="nav-link text-destructive px-4 py-2 tracking-wide text-base font-medium" data-testid="link-sale">SALE</a>
+                <Link href="/sale" className="nav-link text-destructive px-4 py-2 tracking-wide text-base font-medium" data-testid="link-sale">SALE</Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <a href="/about" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-about">ABOUT US</a>
+                <Link href="/about" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-about">ABOUT US</Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <a href="/#contact" className="nav-link px-4 py-2 tracking-wide text-base font-medium" data-testid="link-contact">CONTACT</a>
+                <button onClick={handleContactClick} className="nav-link px-4 py-2 tracking-wide text-base font-medium bg-transparent border-0 cursor-pointer" data-testid="link-contact">CONTACT</button>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
