@@ -776,6 +776,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(5)
         .lean();
 
+      // Monthly sales data for the last 6 months
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      
+      const monthlyOrders = await Order.aggregate([
+        {
+          $match: { createdAt: { $gte: sixMonthsAgo } }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            revenue: { $sum: "$totalAmount" },
+            orders: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { "_id.year": 1, "_id.month": 1 }
+        }
+      ]);
+
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const salesData = monthlyOrders.map(item => ({
+        month: monthNames[item._id.month - 1],
+        revenue: Math.round(item.revenue),
+        orders: item.orders
+      }));
+
+      // Category distribution
+      const categoryStats = await Product.aggregate([
+        {
+          $group: {
+            _id: "$category",
+            count: { $sum: 1 }
+          }
+        }
+      ]);
+
+      const totalProductsForPercentage = await Product.countDocuments();
+      const categoryData = categoryStats.map((cat, index) => ({
+        name: cat._id || 'Other',
+        value: cat.count,
+        percentage: totalProductsForPercentage > 0 ? Math.round((cat.count / totalProductsForPercentage) * 100) : 0
+      }));
+
+      // Weekly sales for last 4 weeks
+      const fourWeeksAgo = new Date();
+      fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+      
+      const weeklyOrders = await Order.aggregate([
+        {
+          $match: { createdAt: { $gte: fourWeeksAgo } }
+        },
+        {
+          $group: {
+            _id: {
+              week: { $week: "$createdAt" }
+            },
+            sales: { $sum: "$totalAmount" }
+          }
+        },
+        {
+          $sort: { "_id.week": 1 }
+        }
+      ]);
+
+      const recentActivity = weeklyOrders.map((item, index) => ({
+        month: `Week ${index + 1}`,
+        sales: Math.round(item.sales)
+      }));
+
       res.json({
         totalProducts,
         totalUsers,
@@ -784,7 +857,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lowStockProducts,
         outOfStockProducts,
         recentOrders,
-        topProducts
+        topProducts,
+        salesData,
+        categoryData,
+        recentActivity
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
