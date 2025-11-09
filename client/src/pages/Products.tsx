@@ -24,7 +24,6 @@ export default function Products() {
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [priceRangeInitialized, setPriceRangeInitialized] = useState(false);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
@@ -57,14 +56,6 @@ export default function Products() {
     // Scroll to top when filters change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [searchString]);
-
-  // Initialize price range from API data
-  useEffect(() => {
-    if (priceRangeData && !priceRangeInitialized) {
-      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
-      setPriceRangeInitialized(true);
-    }
-  }, [priceRangeData, priceRangeInitialized]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev =>
@@ -153,6 +144,13 @@ export default function Products() {
   }>({
     queryKey: ["/api/price-range", priceRangeParams.toString()],
   });
+
+  // Update price range when API data changes
+  useEffect(() => {
+    if (priceRangeData) {
+      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+    }
+  }, [priceRangeData]);
 
   const products = productsData?.products || [];
   const pagination = productsData?.pagination || { total: 0, pages: 1 };

@@ -24,7 +24,6 @@ export default function TrendingCollection() {
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [priceRangeInitialized, setPriceRangeInitialized] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -52,14 +51,6 @@ export default function TrendingCollection() {
     // Scroll to top when filters change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location]);
-
-  // Initialize price range from API data
-  useEffect(() => {
-    if (priceRangeData && !priceRangeInitialized) {
-      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
-      setPriceRangeInitialized(true);
-    }
-  }, [priceRangeData, priceRangeInitialized]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev =>
@@ -140,6 +131,13 @@ export default function TrendingCollection() {
   }>({
     queryKey: ["/api/price-range", priceRangeParams.toString()],
   });
+
+  // Update price range when API data changes
+  useEffect(() => {
+    if (priceRangeData) {
+      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+    }
+  }, [priceRangeData]);
 
   const products = productsData?.products || [];
   const pagination = productsData?.pagination || { total: 0, pages: 1 };
