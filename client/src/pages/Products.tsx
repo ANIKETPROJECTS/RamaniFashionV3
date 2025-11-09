@@ -24,6 +24,7 @@ export default function Products() {
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRangeInitialized, setPriceRangeInitialized] = useState(false);
   const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
@@ -56,6 +57,14 @@ export default function Products() {
     // Scroll to top when filters change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [searchString]);
+
+  // Initialize price range from API data
+  useEffect(() => {
+    if (priceRangeData && !priceRangeInitialized) {
+      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+      setPriceRangeInitialized(true);
+    }
+  }, [priceRangeData, priceRangeInitialized]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev =>
@@ -117,6 +126,34 @@ export default function Products() {
     queryKey: ["/api/filters"],
   });
 
+  // Build price range query params (without page/limit/price)
+  const priceRangeParams = new URLSearchParams();
+  if (selectedCategories.length > 0) {
+    priceRangeParams.append("category", selectedCategories.join(","));
+  }
+  if (selectedFabrics.length > 0) {
+    priceRangeParams.append("fabric", selectedFabrics.join(","));
+  }
+  if (selectedColors.length > 0) {
+    priceRangeParams.append("color", selectedColors.join(","));
+  }
+  if (selectedOccasions.length > 0) {
+    priceRangeParams.append("occasion", selectedOccasions.join(","));
+  }
+  if (inStockOnly) {
+    priceRangeParams.append("inStock", "true");
+  }
+  if (isTrending) {
+    priceRangeParams.append("isTrending", "true");
+  }
+
+  const { data: priceRangeData } = useQuery<{
+    minPrice: number;
+    maxPrice: number;
+  }>({
+    queryKey: ["/api/price-range", priceRangeParams.toString()],
+  });
+
   const products = productsData?.products || [];
   const pagination = productsData?.pagination || { total: 0, pages: 1 };
 
@@ -170,7 +207,8 @@ export default function Products() {
     setSelectedFabrics([]);
     setSelectedColors([]);
     setSelectedOccasions([]);
-    setPriceRange([0, 50000]);
+    const maxPrice = priceRangeData?.maxPrice || 50000;
+    setPriceRange([0, maxPrice]);
     setPriceFilterActive(false);
     setInStockOnly(false);
     setPage(1);
@@ -329,8 +367,8 @@ export default function Products() {
                       setPriceFilterActive(true);
                       setPage(1);
                     }}
-                    min={0}
-                    max={50000}
+                    min={priceRangeData?.minPrice || 0}
+                    max={priceRangeData?.maxPrice || 50000}
                     step={500}
                     data-testid="slider-price-range"
                   />
@@ -653,11 +691,12 @@ export default function Products() {
                       value={priceRange}
                       onValueChange={(val) => {
                         setPriceRange(val);
+                        setPriceFilterActive(true);
                         setPage(1);
                       }}
-                      min={500}
-                      max={50000}
-                      step={500}
+                      min={priceRangeData?.minPrice || 0}
+                      max={priceRangeData?.maxPrice || 50000}
+                      step={100}
                     />
                     <div className="flex items-center justify-between text-sm">
                       <span>₹{priceRange[0]}</span>

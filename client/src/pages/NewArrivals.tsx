@@ -23,6 +23,7 @@ export default function NewArrivals() {
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
   const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRangeInitialized, setPriceRangeInitialized] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -50,6 +51,14 @@ export default function NewArrivals() {
     // Scroll to top when filters change
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location]);
+
+  // Initialize price range from API data
+  useEffect(() => {
+    if (priceRangeData && !priceRangeInitialized) {
+      setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+      setPriceRangeInitialized(true);
+    }
+  }, [priceRangeData, priceRangeInitialized]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev =>
@@ -102,6 +111,33 @@ export default function NewArrivals() {
     occasions: string[];
   }>({
     queryKey: ["/api/filters"],
+  });
+
+  // Build price range query params (without page/limit)
+  const priceRangeParams = new URLSearchParams({
+    isNew: "true",
+  });
+  if (selectedCategories.length > 0) {
+    priceRangeParams.append("category", selectedCategories.join(","));
+  }
+  if (selectedFabrics.length > 0) {
+    priceRangeParams.append("fabric", selectedFabrics.join(","));
+  }
+  if (selectedColors.length > 0) {
+    priceRangeParams.append("color", selectedColors.join(","));
+  }
+  if (selectedOccasions.length > 0) {
+    priceRangeParams.append("occasion", selectedOccasions.join(","));
+  }
+  if (inStockOnly) {
+    priceRangeParams.append("inStock", "true");
+  }
+
+  const { data: priceRangeData } = useQuery<{
+    minPrice: number;
+    maxPrice: number;
+  }>({
+    queryKey: ["/api/price-range", priceRangeParams.toString()],
   });
 
   const products = productsData?.products || [];
@@ -157,7 +193,8 @@ export default function NewArrivals() {
     setSelectedFabrics([]);
     setSelectedColors([]);
     setSelectedOccasions([]);
-    setPriceRange([0, 50000]);
+    const maxPrice = priceRangeData?.maxPrice || 50000;
+    setPriceRange([0, maxPrice]);
     setInStockOnly(false);
     setPage(1);
   };
@@ -326,8 +363,8 @@ export default function NewArrivals() {
                       setPriceRange(val);
                       setPage(1);
                     }}
-                    min={0}
-                    max={50000}
+                    min={priceRangeData?.minPrice || 0}
+                    max={priceRangeData?.maxPrice || 50000}
                     step={100}
                     data-testid="slider-price-range"
                   />
@@ -638,8 +675,8 @@ export default function NewArrivals() {
                         setPriceRange(val);
                         setPage(1);
                       }}
-                      min={500}
-                      max={50000}
+                      min={priceRangeData?.minPrice || 0}
+                      max={priceRangeData?.maxPrice || 50000}
                       step={500}
                     />
                     <div className="flex items-center justify-between text-sm">
