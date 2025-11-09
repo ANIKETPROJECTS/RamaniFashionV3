@@ -180,6 +180,9 @@ export default function Login() {
                       }}
                       required
                       disabled={otpVerified}
+                      autoComplete="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       data-testid="input-phone"
                     />
                     {!otpVerified && (
@@ -272,7 +275,7 @@ export default function Login() {
                 <div className="text-center">
                   <Button
                     type="button"
-                    variant="link"
+                    variant="ghost"
                     onClick={() => {
                       setIsRegister(!isRegister);
                       resetOtpState();

@@ -132,13 +132,20 @@ export default function TrendingCollection() {
     queryKey: ["/api/price-range", priceRangeParams.toString()],
   });
 
-  // Update price range when API data changes
+  // Update price range when API data changes - clamp values to new bounds
   useEffect(() => {
     if (priceRangeData) {
+      console.log('🔍 Trending Collection - Price Range Data from API:', priceRangeData);
       if (priceRangeData.maxPrice > 0) {
-        setPriceRange([priceRangeData.minPrice, priceRangeData.maxPrice]);
+        setPriceRange(prev => {
+          const newMin = Math.max(priceRangeData.minPrice, Math.min(prev[0], priceRangeData.maxPrice));
+          const newMax = Math.min(priceRangeData.maxPrice, Math.max(prev[1], priceRangeData.minPrice));
+          console.log('✅ Setting price range - Min:', newMin, 'Max:', newMax);
+          return [newMin, newMax];
+        });
       } else {
         // If no products, use fallback
+        console.log('⚠️ No products found, using fallback range [0, 10000]');
         setPriceRange([0, 10000]);
       }
     }
