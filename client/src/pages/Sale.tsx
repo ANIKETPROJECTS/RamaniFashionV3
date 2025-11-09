@@ -224,7 +224,7 @@ export default function Sale() {
                 Sale Products
               </h2>
               <p className="text-muted-foreground" data-testid="text-results-count">
-                {products.length} products
+                {pagination.total} products
               </p>
             </div>
             
