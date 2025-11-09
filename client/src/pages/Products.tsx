@@ -23,7 +23,8 @@ export default function Products() {
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("");
   const [page, setPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([1000, 10000]);
+  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -66,9 +67,13 @@ export default function Products() {
   const queryParams = new URLSearchParams({
     page: page.toString(),
     limit: "12",
-    minPrice: priceRange[0].toString(),
-    maxPrice: priceRange[1].toString(),
   });
+
+  // Only add price filter if user has explicitly interacted with it
+  if (priceFilterActive) {
+    queryParams.append("minPrice", priceRange[0].toString());
+    queryParams.append("maxPrice", priceRange[1].toString());
+  }
 
   if (sortBy && order) {
     queryParams.append("sort", sortBy);
@@ -165,7 +170,8 @@ export default function Products() {
     setSelectedFabrics([]);
     setSelectedColors([]);
     setSelectedOccasions([]);
-    setPriceRange([1000, 10000]);
+    setPriceRange([0, 50000]);
+    setPriceFilterActive(false);
     setInStockOnly(false);
     setPage(1);
   };
@@ -320,11 +326,12 @@ export default function Products() {
                     value={priceRange}
                     onValueChange={(val) => {
                       setPriceRange(val);
+                      setPriceFilterActive(true);
                       setPage(1);
                     }}
-                    min={1000}
-                    max={10000}
-                    step={100}
+                    min={0}
+                    max={50000}
+                    step={500}
                     data-testid="slider-price-range"
                   />
                   <div className="flex items-center justify-between text-sm">

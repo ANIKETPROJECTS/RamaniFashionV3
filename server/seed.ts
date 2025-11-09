@@ -537,13 +537,13 @@ export async function seedDatabase() {
     await connectDB();
     
     const count = await Product.countDocuments();
-    if (count > 0) {
-      console.log('🔄 Updating existing products with new images...');
-      await Product.deleteMany({});
+    if (count === 0) {
+      console.log('🌱 Seeding database with sample products...');
+      await Product.insertMany(sampleProducts);
+      console.log('✅ Database seeded successfully with', sampleProducts.length, 'products');
+    } else {
+      console.log(`✅ Database already contains ${count} products, skipping seed`);
     }
-
-    await Product.insertMany(sampleProducts);
-    console.log('✅ Database seeded successfully with', sampleProducts.length, 'products');
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     throw error;
