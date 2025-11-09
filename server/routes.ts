@@ -116,26 +116,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const skip = (pageNum - 1) * limitNum;
 
       const sortOrder = order === 'asc' ? 1 : -1;
-      const sortObj: any = {};
-      sortObj[sort as string] = sortOrder;
 
-      const products = await Product.find(query)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(limitNum)
-        .lean();
+      // Special handling for discount sorting - use aggregation
+      if (sort === 'discount') {
+        const pipeline: any[] = [
+          { $match: query },
+          {
+            $addFields: {
+              discountPercent: {
+                $cond: {
+                  if: { $and: [
+                    { $gt: ['$originalPrice', 0] },
+                    { $ne: ['$originalPrice', null] }
+                  ]},
+                  then: {
+                    $multiply: [
+                      { $divide: [
+                        { $subtract: ['$originalPrice', '$price'] },
+                        '$originalPrice'
+                      ]},
+                      100
+                    ]
+                  },
+                  else: 0
+                }
+              }
+            }
+          },
+          { $sort: { discountPercent: sortOrder } },
+          { $skip: skip },
+          { $limit: limitNum }
+        ];
 
-      const total = await Product.countDocuments(query);
+        const products = await Product.aggregate(pipeline);
+        const total = await Product.countDocuments(query);
 
-      res.json({
-        products,
-        pagination: {
-          page: pageNum,
-          limit: limitNum,
-          total,
-          pages: Math.ceil(total / limitNum)
-        }
-      });
+        res.json({
+          products,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            pages: Math.ceil(total / limitNum)
+          }
+        });
+      } else {
+        // Normal sorting for other fields
+        const sortObj: any = {};
+        sortObj[sort as string] = sortOrder;
+
+        const products = await Product.find(query)
+          .sort(sortObj)
+          .skip(skip)
+          .limit(limitNum)
+          .lean();
+
+        const total = await Product.countDocuments(query);
+
+        res.json({
+          products,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            pages: Math.ceil(total / limitNum)
+          }
+        });
+      }
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
