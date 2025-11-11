@@ -374,8 +374,8 @@ export default function Products() {
                       setPriceFilterActive(true);
                       setPage(1);
                     }}
-                    min={priceRange[0]}
-                    max={priceRange[1]}
+                    min={priceRangeData?.minPrice || 0}
+                    max={priceRangeData?.maxPrice || 10000}
                     step={500}
                     data-testid="slider-price-range"
                   />
@@ -701,8 +701,8 @@ export default function Products() {
                         setPriceFilterActive(true);
                         setPage(1);
                       }}
-                      min={priceRange[0]}
-                      max={priceRange[1]}
+                      min={priceRangeData?.minPrice || 0}
+                      max={priceRangeData?.maxPrice || 10000}
                       step={100}
                     />
                     <div className="flex items-center justify-between text-sm">

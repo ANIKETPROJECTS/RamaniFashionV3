@@ -371,8 +371,8 @@ export default function NewArrivals() {
                       setPriceRange(val);
                       setPage(1);
                     }}
-                    min={priceRange[0]}
-                    max={priceRange[1]}
+                    min={priceRangeData?.minPrice || 0}
+                    max={priceRangeData?.maxPrice || 10000}
                     step={100}
                     data-testid="slider-price-range"
                   />
