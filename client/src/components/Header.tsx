@@ -9,6 +9,7 @@ import { useState, useEffect, type MouseEvent } from "react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import { LoginDialog } from "@/components/LoginDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +50,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   const [storageUpdateTrigger, setStorageUpdateTrigger] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   // Parse URL to determine active navigation state
   const getActiveNavState = () => {
@@ -291,7 +293,7 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="ghost" size="icon" className="h-12 w-12 hover:bg-gray-100" onClick={() => setLocation("/login")} data-testid="button-login">
+              <Button variant="ghost" size="icon" className="h-12 w-12 hover:bg-gray-100" onClick={() => setLoginDialogOpen(true)} data-testid="button-login">
                 <User className="h-8 w-8" />
               </Button>
             )}
@@ -598,6 +600,8 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
           </nav>
         </SheetContent>
       </Sheet>
+
+      <LoginDialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen} />
     </header>
   );
 }
