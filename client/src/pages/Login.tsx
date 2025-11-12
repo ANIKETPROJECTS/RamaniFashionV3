@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -25,6 +25,11 @@ export default function Login() {
     phone: "",
     otp: "",
   });
+  
+  const [phoneDigits, setPhoneDigits] = useState(Array(10).fill(""));
+  const [otpDigits, setOtpDigits] = useState(Array(6).fill(""));
+  const phoneInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const loginMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/auth/login", "POST", data),
@@ -132,7 +137,65 @@ export default function Login() {
     setOtpSent(false);
     setOtpVerified(false);
     setFormData({ ...formData, otp: "" });
+    setOtpDigits(Array(6).fill(""));
   };
+
+  const handlePhoneDigitChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    
+    const newDigits = [...phoneDigits];
+    newDigits[index] = value.slice(-1);
+    setPhoneDigits(newDigits);
+    
+    const phone = newDigits.join("");
+    setFormData({ ...formData, phone });
+    
+    if (value && index < 9) {
+      phoneInputRefs.current[index + 1]?.focus();
+    }
+    
+    if (!value && phone.length < 10) {
+      setOtpSent(false);
+      setOtpVerified(false);
+    }
+  };
+
+  const handlePhoneKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !phoneDigits[index] && index > 0) {
+      phoneInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpDigitChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    
+    const newDigits = [...otpDigits];
+    newDigits[index] = value.slice(-1);
+    setOtpDigits(newDigits);
+    
+    const otp = newDigits.join("");
+    setFormData({ ...formData, otp });
+    
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  useEffect(() => {
+    const phone = phoneDigits.join("");
+    setFormData(prev => ({ ...prev, phone }));
+  }, [phoneDigits]);
+
+  useEffect(() => {
+    const otp = otpDigits.join("");
+    setFormData(prev => ({ ...prev, otp }));
+  }, [otpDigits]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -167,31 +230,37 @@ export default function Login() {
 
               {!isAdminLogin && (
                 <div>
-                  <Label htmlFor="phone">Mobile Number</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="10-digit mobile number"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                        setFormData(prev => ({ ...prev, phone: value, otp: '' }));
-                        setOtpSent(false);
-                        setOtpVerified(false);
-                      }}
-                      required
-                      disabled={otpVerified}
-                      autoComplete="off"
-                      inputMode="numeric"
-                      maxLength={10}
-                      data-testid="input-phone"
-                    />
+                  <Label>Mobile Number</Label>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-secondary px-3 py-2 rounded-full border border-border">
+                        <span className="text-2xl">🇮🇳</span>
+                        <span className="font-semibold text-sm">+91</span>
+                      </div>
+                      <div className="flex gap-1 flex-1">
+                        {phoneDigits.map((digit, index) => (
+                          <input
+                            key={index}
+                            ref={(el) => (phoneInputRefs.current[index] = el)}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handlePhoneDigitChange(index, e.target.value)}
+                            onKeyDown={(e) => handlePhoneKeyDown(index, e)}
+                            disabled={otpVerified}
+                            className="w-9 h-11 text-center text-lg font-semibold border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                            data-testid={`input-phone-${index}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
                     {!otpVerified && (
                       <Button
                         type="button"
                         onClick={handleSendOtp}
-                        disabled={sendOtpMutation.isPending || !formData.phone}
+                        disabled={sendOtpMutation.isPending || formData.phone.length !== 10}
+                        className="w-full rounded-full"
                         data-testid="button-send-otp"
                       >
                         {otpSent ? "Resend" : "Send OTP"}
@@ -203,29 +272,37 @@ export default function Login() {
 
               {!isAdminLogin && otpSent && !otpVerified && (
                 <div>
-                  <Label htmlFor="otp">Enter OTP</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="otp"
-                      type="text"
-                      placeholder="Enter 6-digit OTP"
-                      value={formData.otp}
-                      onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                      maxLength={6}
-                      data-testid="input-otp"
-                    />
+                  <Label>Enter OTP</Label>
+                  <div className="space-y-3">
+                    <div className="flex justify-center gap-2">
+                      {otpDigits.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (otpInputRefs.current[index] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleOtpDigitChange(index, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                          className="w-12 h-14 text-center text-xl font-bold border-2 border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                          data-testid={`input-otp-${index}`}
+                        />
+                      ))}
+                    </div>
                     <Button
                       type="button"
                       onClick={handleVerifyOtp}
-                      disabled={verifyOtpMutation.isPending || !formData.otp}
+                      disabled={verifyOtpMutation.isPending || formData.otp.length !== 6}
+                      className="w-full rounded-full"
                       data-testid="button-verify-otp"
                     >
                       Verify
                     </Button>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Test OTP: 123456
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Test OTP: 123456
-                  </p>
                 </div>
               )}
 
@@ -266,7 +343,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full rounded-full"
                 disabled={loginMutation.isPending || registerMutation.isPending || adminLoginMutation.isPending}
                 data-testid="button-submit"
               >
@@ -278,9 +355,12 @@ export default function Login() {
                   <Button
                     type="button"
                     variant="ghost"
+                    className="rounded-full"
                     onClick={() => {
                       setIsRegister(!isRegister);
                       resetOtpState();
+                      setPhoneDigits(Array(10).fill(""));
+                      setOtpDigits(Array(6).fill(""));
                     }}
                     data-testid="button-toggle-mode"
                   >
@@ -298,9 +378,11 @@ export default function Login() {
                     setIsRegister(false);
                     setFormData({ name: "", email: "", password: "", phone: "", otp: "" });
                     resetOtpState();
+                    setPhoneDigits(Array(10).fill(""));
+                    setOtpDigits(Array(6).fill(""));
                   }}
                   data-testid="button-admin-toggle"
-                  className="w-full"
+                  className="w-full rounded-full"
                 >
                   {isAdminLogin ? "Back to User Login" : "Login as Admin"}
                 </Button>
