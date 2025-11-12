@@ -86,6 +86,7 @@ export default function Footer() {
               <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-about-footer">About Us</Link></li>
               <li><Link href="/sale" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-sale-footer">Sale</Link></li>
               <li><Link href="/#contact" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-contact-footer">Contact</Link></li>
+              <li><Link href="/admin/login" className="text-muted-foreground hover:text-primary transition-colors" data-testid="link-admin-footer">Admin Panel</Link></li>
             </ul>
           </div>
 
