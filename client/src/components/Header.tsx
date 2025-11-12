@@ -333,9 +333,9 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
       </div>
 
       <nav className="hidden md:block bg-white relative">
-        <div className="max-w-7xl mx-auto px-4">
-          <NavigationMenu className="flex w-full justify-center">
-            <NavigationMenuList className="flex items-center justify-center gap-8 py-2">
+        <div className="w-full">
+          <NavigationMenu className="max-w-7xl mx-auto">
+            <NavigationMenuList className="flex items-center justify-center gap-8 py-2 w-full">
               <NavigationMenuItem>
                 <a 
                   href="/" 
