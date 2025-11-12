@@ -192,6 +192,17 @@ export default function ProductManagement() {
       return;
     }
 
+    const hasImages = colorVariants.some(variant => variant.images && variant.images.length > 0);
+    
+    if ((productForm.isNew || productForm.isTrending) && !hasImages) {
+      toast({
+        title: "Images required for New/Trending products",
+        description: "Please add at least one image before marking a product as New Arrival or Trending",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const formattedData = {
       name: productForm.name,
       description: productForm.description,
