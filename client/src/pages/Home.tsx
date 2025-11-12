@@ -242,6 +242,65 @@ export default function Home() {
         </motion.div>
 
         <motion.section 
+          className="py-8 md:py-12 bg-white"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <motion.div 
+                className="flex gap-6 md:gap-8 pb-4 justify-start"
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                {newCategories.map((category, index) => (
+                  <motion.div
+                    key={category.name}
+                    variants={fadeInUp}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center cursor-pointer group flex-shrink-0"
+                    onClick={() => {
+                      if (category.name === "Sale") {
+                        setLocation("/sale");
+                      } else {
+                        setLocation(`/products?category=${encodeURIComponent(category.name)}`);
+                      }
+                    }}
+                    data-testid={`category-circle-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <div 
+                      className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden mb-2 md:mb-3 transition-all duration-300 group-hover:scale-105"
+                      style={{ 
+                        border: '2px solid hsl(338, 78%, 62%)',
+                        padding: '3px'
+                      }}
+                    >
+                      <div className="w-full h-full rounded-full overflow-hidden">
+                        <img 
+                          src={category.image} 
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <h3 
+                      className="text-center text-xs md:text-sm font-medium max-w-[100px] md:max-w-[130px]"
+                      style={{ color: 'hsl(338, 78%, 62%)' }}
+                    >
+                      {category.name}
+                    </h3>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section 
           className="py-8 md:py-12" 
           style={{ backgroundColor: 'rgba(250, 220, 235, 0.7)' }}
           initial={{ opacity: 0, y: 50 }}
