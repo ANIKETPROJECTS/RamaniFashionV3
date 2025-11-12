@@ -310,11 +310,7 @@ export default function ProductDetail() {
               </Button>
             </div>
 
-          </motion.div>
-        </motion.div>
-
-        <div className="mb-8 max-w-4xl mx-auto">
-          <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="details">
               <AccordionTrigger 
                 className="text-lg font-bold text-[#6B4423] dark:text-[#D4A373] hover:no-underline"
@@ -496,7 +492,9 @@ export default function ProductDetail() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </div>
+
+          </motion.div>
+        </motion.div>
 
         {similarProducts && similarProducts.length > 0 && (
           <motion.div
