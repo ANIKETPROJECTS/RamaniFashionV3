@@ -57,14 +57,34 @@ const productSchema = new Schema({
 
 productSchema.index({ name: 'text', description: 'text' });
 
-// User Schema
+// User Schema (for Admin)
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
   phoneVerified: { type: Boolean, default: false },
+  role: { type: String, default: 'admin' },
   createdAt: { type: Date, default: Date.now },
+});
+
+// Customer Schema (for phone-based OTP login)
+const customerSchema = new Schema({
+  phone: { type: String, required: true, unique: true },
+  name: { type: String },
+  email: { type: String },
+  dob: { type: Date },
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    pincode: String,
+    landmark: String,
+  },
+  phoneVerified: { type: Boolean, default: false },
+  notifyUpdates: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 // OTP Schema for temporary storage (dummy implementation)
@@ -78,7 +98,7 @@ const otpSchema = new Schema({
 
 // Address Schema
 const addressSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   fullName: { type: String, required: true },
   phone: { type: String, required: true },
   pincode: { type: String, required: true },
@@ -93,7 +113,7 @@ const addressSchema = new Schema({
 
 // Cart Schema
 const cartSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   items: [{
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, default: 1 },
@@ -104,14 +124,14 @@ const cartSchema = new Schema({
 
 // Wishlist Schema
 const wishlistSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   updatedAt: { type: Date, default: Date.now },
 });
 
 // Order Schema
 const orderSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   orderNumber: { type: String, required: true, unique: true },
   items: [{
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -156,6 +176,7 @@ const contactSubmissionSchema = new Schema({
 // Export models
 export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
+export const Customer = mongoose.models.Customer || mongoose.model('Customer', customerSchema);
 export const Address = mongoose.models.Address || mongoose.model('Address', addressSchema);
 export const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
 export const Wishlist = mongoose.models.Wishlist || mongoose.model('Wishlist', wishlistSchema);
