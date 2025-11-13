@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import ramaniLogo from "@assets/PNG__B_ LOGO_1762442171742.png";
 import { auth } from "@/lib/auth";
+import { queryClient } from "@/lib/queryClient";
 
 interface LoginDialogProps {
   open: boolean;
@@ -123,6 +124,14 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           email: data.customer.email || undefined
         });
       }
+      
+      // Invalidate all user-specific data from React Query cache to force refetch with new user data
+      // Using invalidateQueries instead of removeQueries to ensure active observers refetch immediately
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/addresses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       
       const isNewCustomer = !data.customer?.name;
       toast({

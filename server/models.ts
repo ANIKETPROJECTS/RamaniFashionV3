@@ -83,6 +83,22 @@ const customerSchema = new Schema({
   },
   phoneVerified: { type: Boolean, default: false },
   notifyUpdates: { type: Boolean, default: false },
+  wishlist: [{
+    productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+    addedAt: { type: Date, default: Date.now },
+  }],
+  cart: [{
+    productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+    quantity: { type: Number, default: 1 },
+    addedAt: { type: Date, default: Date.now },
+  }],
+  orders: [{
+    orderId: { type: Schema.Types.ObjectId, ref: 'Order' },
+    orderNumber: String,
+    total: Number,
+    status: String,
+    createdAt: { type: Date, default: Date.now },
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -171,6 +187,139 @@ const contactSubmissionSchema = new Schema({
   category: { type: String, required: true },
   message: { type: String },
   createdAt: { type: Date, default: Date.now },
+});
+
+// Sync helper functions to keep Customer embedded arrays in sync with authoritative collections
+async function syncCustomerCart(customerId: any) {
+  try {
+    const CustomerModel = mongoose.models.Customer || mongoose.model('Customer', customerSchema);
+    const CartModel = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
+    
+    const cart = await CartModel.findOne({ userId: customerId });
+    const cartItems = cart?.items.map((item: any) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      addedAt: item.addedAt
+    })) || [];
+    
+    await CustomerModel.findByIdAndUpdate(customerId, {
+      cart: cartItems,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error syncing customer cart:', error);
+  }
+}
+
+async function syncCustomerWishlist(customerId: any) {
+  try {
+    const CustomerModel = mongoose.models.Customer || mongoose.model('Customer', customerSchema);
+    const WishlistModel = mongoose.models.Wishlist || mongoose.model('Wishlist', wishlistSchema);
+    
+    const wishlist = await WishlistModel.findOne({ userId: customerId });
+    const wishlistItems = wishlist?.products.map((productId: any) => ({
+      productId,
+      addedAt: wishlist.updatedAt || new Date()
+    })) || [];
+    
+    await CustomerModel.findByIdAndUpdate(customerId, {
+      wishlist: wishlistItems,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error syncing customer wishlist:', error);
+  }
+}
+
+async function syncCustomerOrders(customerId: any) {
+  try {
+    const CustomerModel = mongoose.models.Customer || mongoose.model('Customer', customerSchema);
+    const OrderModel = mongoose.models.Order || mongoose.model('Order', orderSchema);
+    
+    const orders = await OrderModel.find({ userId: customerId }).sort({ createdAt: -1 }).limit(20);
+    const orderItems = orders.map((order: any) => ({
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      total: order.total,
+      status: order.orderStatus,
+      createdAt: order.createdAt
+    }));
+    
+    await CustomerModel.findByIdAndUpdate(customerId, {
+      orders: orderItems,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error syncing customer orders:', error);
+  }
+}
+
+// Add Mongoose middleware hooks to auto-sync embedded customer arrays
+
+// Cart hooks
+cartSchema.post('save', async function(doc) {
+  if (doc.userId) {
+    await syncCustomerCart(doc.userId);
+  }
+});
+
+cartSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerCart(doc.userId);
+  }
+});
+
+cartSchema.post('findOneAndDelete', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerCart(doc.userId);
+  }
+});
+
+// Wishlist hooks
+wishlistSchema.post('save', async function(doc) {
+  if (doc.userId) {
+    await syncCustomerWishlist(doc.userId);
+  }
+});
+
+wishlistSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerWishlist(doc.userId);
+  }
+});
+
+wishlistSchema.post('findOneAndDelete', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerWishlist(doc.userId);
+  }
+});
+
+// Order hooks
+orderSchema.post('save', async function(doc) {
+  if (doc.userId) {
+    await syncCustomerOrders(doc.userId);
+  }
+});
+
+orderSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerOrders(doc.userId);
+  }
+});
+
+orderSchema.post('findOneAndDelete', async function(doc) {
+  if (doc?.userId) {
+    await syncCustomerOrders(doc.userId);
+  }
+});
+
+orderSchema.post('deleteMany', async function() {
+  // For bulk deletes, we need to sync all affected customers
+  // This is a catch-all to ensure consistency
+  const query = this.getFilter();
+  if (query.userId) {
+    await syncCustomerOrders(query.userId);
+  }
 });
 
 // Export models
