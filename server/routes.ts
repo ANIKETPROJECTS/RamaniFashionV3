@@ -9,6 +9,7 @@ import path from "path";
 import fs from "fs";
 import XLSX from "xlsx";
 import { upload } from "./upload-config";
+import { sendWhatsAppOTP, generateOTP } from "./whatsapp-service";
 
 const JWT_SECRET = process.env.SESSION_SECRET || "ramani-fashion-secret-key";
 const ADMIN_JWT_SECRET = process.env.ADMIN_SESSION_SECRET || "ramani-admin-secret-key-2024";
@@ -302,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // OTP Routes (Dummy Implementation)
+  // OTP Routes (WhatsApp Integration)
   app.post("/api/auth/send-otp", async (req, res) => {
     try {
       const { phone } = req.body;
@@ -314,24 +315,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete any existing OTP for this phone number
       await OTP.deleteMany({ phone });
 
-      // Generate dummy OTP (always 123456 for testing)
-      const dummyOtp = "123456";
+      // Generate random 6-digit OTP
+      const otpCode = generateOTP();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+      // Save OTP to database
       const otp = new OTP({
         phone,
-        otp: dummyOtp,
+        otp: otpCode,
         expiresAt
       });
 
       await otp.save();
 
-      // In production, you would send this OTP via SMS
-      // For now, we return it in the response for testing
-      res.json({ 
-        message: 'OTP sent successfully',
-        otp: dummyOtp // Remove this in production!
-      });
+      // Send OTP via WhatsApp
+      try {
+        await sendWhatsAppOTP({
+          phoneNumber: phone,
+          otp: otpCode
+        });
+
+        res.json({ 
+          message: 'OTP sent successfully to WhatsApp'
+        });
+      } catch (whatsappError: any) {
+        console.error('WhatsApp sending failed:', whatsappError);
+        // Delete the saved OTP since sending failed
+        await OTP.deleteOne({ _id: otp._id });
+        
+        return res.status(500).json({ 
+          error: 'Failed to send OTP via WhatsApp. Please try again.' 
+        });
+      }
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
