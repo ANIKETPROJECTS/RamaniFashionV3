@@ -10,6 +10,7 @@ import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { LoginDialog } from "@/components/LoginDialog";
+import { auth } from "@/lib/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,15 +146,29 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
   const actualWishlistCount = getWishlistCount();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    // Check for both old "user" format and new "customer" format
+    const loadUser = () => {
+      const storedUser = localStorage.getItem("user");
+      const customer = auth.getCustomer();
+      
+      if (customer) {
+        setUser(customer);
+      } else if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+    };
+
+    loadUser();
 
     // Listen for cart/wishlist updates in localStorage
     const handleStorageChange = () => {
       setStorageUpdateTrigger(prev => prev + 1);
     };
+
+    // Listen for auth changes
+    const unsubscribe = auth.onAuthChange(loadUser);
 
     // Listen for custom events (when localStorage is updated programmatically in the same window)
     window.addEventListener('cartUpdated', handleStorageChange);
@@ -161,13 +176,15 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
     
     // Cleanup
     return () => {
+      unsubscribe();
       window.removeEventListener('cartUpdated', handleStorageChange);
       window.removeEventListener('wishlistUpdated', handleStorageChange);
     };
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    // Use auth utility to clear all auth data
+    auth.logout();
     localStorage.removeItem("user");
     setUser(null);
     // Clear cart and other user-specific query caches
@@ -300,7 +317,19 @@ export default function Header({ cartCount = 0, wishlistCount = 0, onMenuClick }
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="ghost" size="icon" className="h-12 w-12 hover:bg-gray-100" onClick={() => setLoginDialogOpen(true)} data-testid="button-login">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-12 w-12 hover:bg-gray-100" 
+                onClick={() => {
+                  if (auth.isAuthenticated()) {
+                    setLocation("/profile");
+                  } else {
+                    setLoginDialogOpen(true);
+                  }
+                }} 
+                data-testid="button-login"
+              >
                 <User className="h-8 w-8" />
               </Button>
             )}

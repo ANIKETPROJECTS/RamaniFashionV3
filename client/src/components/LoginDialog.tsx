@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import ramaniLogo from "@assets/PNG__B_ LOGO_1762442171742.png";
+import { auth } from "@/lib/auth";
 
 interface LoginDialogProps {
   open: boolean;
@@ -113,21 +114,26 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       return res.json();
     },
     onSuccess: (data) => {
-      // Store the token
-      if (data.token) {
-        localStorage.setItem('auth_token', data.token);
+      // Store the token and customer data using auth utility
+      if (data.token && data.customer && data.customer.id && data.customer.phone) {
+        auth.login(data.token, {
+          id: data.customer.id.toString(),
+          phone: data.customer.phone,
+          name: data.customer.name || undefined,
+          email: data.customer.email || undefined
+        });
       }
       
       const isNewCustomer = !data.customer?.name;
       toast({
         title: isNewCustomer ? "Welcome to Ramani Fashion!" : "Welcome Back!",
         description: isNewCustomer 
-          ? "Your account has been created successfully" 
+          ? "Your account has been created. Complete your profile to continue." 
           : data.message || "Login successful"
       });
       onOpenChange(false);
       resetForm();
-      setLocation("/");
+      setLocation("/profile");
     },
     onError: (error: Error) => {
       toast({

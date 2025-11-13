@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { User, MapPin, Trash2, Plus, Calendar, Mail, Edit2 } from "lucide-react";
+import { auth } from "@/lib/auth";
 
 export default function Profile() {
   const { toast } = useToast();
@@ -49,10 +50,12 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (!userLoading && (userError || !user)) {
-      setLocation("/login");
+    // Only redirect if we're not authenticated at all (no token)
+    // Don't redirect if query is still loading or if we have a token but query failed temporarily
+    if (!userLoading && !auth.isAuthenticated()) {
+      setLocation("/");
     }
-  }, [user, userLoading, userError, setLocation]);
+  }, [userLoading, setLocation]);
 
   useEffect(() => {
     if (user) {
