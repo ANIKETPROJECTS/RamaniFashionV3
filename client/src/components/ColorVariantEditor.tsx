@@ -11,6 +11,8 @@ import { Upload, Link as LinkIcon, Trash2, Edit2, Plus, X } from "lucide-react";
 export interface ColorVariant {
   color: string;
   images: string[];
+  stockQuantity: number;
+  inStock: boolean;
 }
 
 interface ColorVariantEditorProps {
@@ -26,6 +28,8 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
   
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [currentImages, setCurrentImages] = useState<string[]>(["", "", "", "", ""]);
+  const [stockQuantity, setStockQuantity] = useState<number>(0);
+  const [inStock, setInStock] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean[]>([false, false, false, false, false]);
   const [uploadFailed, setUploadFailed] = useState<boolean[]>([false, false, false, false, false]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -158,9 +162,33 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
       return;
     }
 
+    if (stockQuantity < 0) {
+      toast({ 
+        title: "Invalid stock quantity", 
+        description: "Stock quantity cannot be negative",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    const finalInStock = stockQuantity > 0 ? inStock : false;
+    
+    if (stockQuantity === 0 && inStock) {
+      toast({ 
+        title: "Stock adjusted", 
+        description: "Stock quantity is 0, so this color variant will be marked as out of stock.",
+        variant: "default"
+      });
+    }
+
     if (editingIndex !== null) {
       const updatedVariants = [...variants];
-      updatedVariants[editingIndex] = { color: selectedColor, images: validImages };
+      updatedVariants[editingIndex] = { 
+        color: selectedColor, 
+        images: validImages,
+        stockQuantity: stockQuantity,
+        inStock: finalInStock
+      };
       onChange(updatedVariants);
       toast({ title: "Color variant updated!" });
       setEditingIndex(null);
@@ -173,12 +201,19 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
         });
         return;
       }
-      onChange([...variants, { color: selectedColor, images: validImages }]);
+      onChange([...variants, { 
+        color: selectedColor, 
+        images: validImages,
+        stockQuantity: stockQuantity,
+        inStock: finalInStock
+      }]);
       toast({ title: "Color variant added successfully!" });
     }
 
     setSelectedColor("");
     setCurrentImages(["", "", "", "", ""]);
+    setStockQuantity(0);
+    setInStock(true);
     setUploadFailed([false, false, false, false, false]);
   };
 
@@ -190,6 +225,8 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
       paddedImages.push("");
     }
     setCurrentImages(paddedImages);
+    setStockQuantity(variant.stockQuantity || 0);
+    setInStock(variant.inStock !== undefined ? variant.inStock : true);
     setEditingIndex(index);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -202,6 +239,8 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
   const handleCancelEdit = () => {
     setSelectedColor("");
     setCurrentImages(["", "", "", "", ""]);
+    setStockQuantity(0);
+    setInStock(true);
     setUploadFailed([false, false, false, false, false]);
     setEditingIndex(null);
   };
@@ -251,6 +290,38 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="stock-quantity" data-testid="label-stock-quantity">
+                Stock Quantity *
+              </Label>
+              <Input
+                id="stock-quantity"
+                type="number"
+                min="0"
+                value={stockQuantity}
+                onChange={(e) => setStockQuantity(parseInt(e.target.value) || 0)}
+                data-testid="input-stock-quantity"
+              />
+            </div>
+
+            <div className="space-y-2 flex items-end">
+              <div className="flex items-center gap-2 h-9">
+                <input
+                  id="in-stock"
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={(e) => setInStock(e.target.checked)}
+                  className="h-4 w-4"
+                  data-testid="checkbox-in-stock"
+                />
+                <Label htmlFor="in-stock" className="cursor-pointer" data-testid="label-in-stock">
+                  In Stock
+                </Label>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -371,11 +442,17 @@ export function ColorVariantEditor({ variants, onChange, availableColors, adminT
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Badge data-testid={`badge-color-${index}`}>{variant.color}</Badge>
                           <span className="text-sm text-muted-foreground">
                             {variant.images.length} image{variant.images.length !== 1 ? 's' : ''}
                           </span>
+                          <Badge variant={(variant.inStock ?? true) ? "default" : "secondary"} data-testid={`badge-stock-status-${index}`}>
+                            Stock: {variant.stockQuantity ?? 0}
+                          </Badge>
+                          <Badge variant={(variant.inStock ?? true) ? "default" : "secondary"} data-testid={`badge-availability-${index}`}>
+                            {(variant.inStock ?? true) ? "In Stock" : "Out of Stock"}
+                          </Badge>
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           {variant.images.map((img, imgIndex) => (

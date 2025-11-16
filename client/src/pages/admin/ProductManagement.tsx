@@ -45,8 +45,6 @@ export default function ProductManagement() {
     workType: "",
     blousePiece: false,
     sareeLength: "",
-    stockQuantity: "",
-    inStock: true,
     isNew: false,
     isTrending: false,
     isBestseller: false,
@@ -165,8 +163,6 @@ export default function ProductManagement() {
       workType: "",
       blousePiece: false,
       sareeLength: "",
-      stockQuantity: "",
-      inStock: true,
       isNew: false,
       isTrending: false,
       isBestseller: false,
@@ -203,6 +199,13 @@ export default function ProductManagement() {
       return;
     }
 
+    const totalStock = colorVariants.reduce((sum, variant) => sum + (variant.stockQuantity ?? 0), 0);
+    const anyInStock = colorVariants.some(variant => {
+      const stock = variant.stockQuantity ?? 0;
+      const isInStock = variant.inStock ?? true;
+      return isInStock && stock > 0;
+    });
+
     const formattedData = {
       name: productForm.name,
       description: productForm.description,
@@ -217,8 +220,8 @@ export default function ProductManagement() {
       workType: productForm.workType || undefined,
       blousePiece: productForm.blousePiece,
       sareeLength: productForm.sareeLength || undefined,
-      stockQuantity: parseInt(productForm.stockQuantity) || 0,
-      inStock: productForm.inStock,
+      stockQuantity: totalStock,
+      inStock: anyInStock,
       isNew: productForm.isNew,
       isTrending: productForm.isTrending,
       isBestseller: productForm.isBestseller,
@@ -329,7 +332,7 @@ export default function ProductManagement() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price" data-testid="label-price">Price *</Label>
                   <Input
@@ -352,17 +355,6 @@ export default function ProductManagement() {
                     value={productForm.originalPrice}
                     onChange={(e) => setProductForm({...productForm, originalPrice: e.target.value})}
                     data-testid="input-original-price"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="stockQuantity" data-testid="label-stock-quantity">Stock Quantity</Label>
-                  <Input
-                    id="stockQuantity"
-                    type="number"
-                    value={productForm.stockQuantity}
-                    onChange={(e) => setProductForm({...productForm, stockQuantity: e.target.value})}
-                    data-testid="input-stock-quantity"
                   />
                 </div>
               </div>
@@ -428,16 +420,6 @@ export default function ProductManagement() {
                     data-testid="checkbox-blouse-piece"
                   />
                   <Label htmlFor="blousePiece" data-testid="label-blouse-piece">Blouse Piece</Label>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="inStock"
-                    checked={productForm.inStock}
-                    onCheckedChange={(checked) => setProductForm({...productForm, inStock: checked as boolean})}
-                    data-testid="checkbox-in-stock"
-                  />
-                  <Label htmlFor="inStock" data-testid="label-in-stock">In Stock</Label>
                 </div>
 
                 <div className="flex items-center gap-2">

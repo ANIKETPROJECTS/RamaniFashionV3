@@ -22,7 +22,9 @@ const productSchema = new Schema({
           },
           message: 'Each color variant must have between 1 and 5 non-empty image URLs'
         }
-      }
+      },
+      stockQuantity: { type: Number, default: 0 },
+      inStock: { type: Boolean, default: true }
     }],
     validate: {
       validator: function(v: any[]) {
