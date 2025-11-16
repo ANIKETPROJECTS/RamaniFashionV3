@@ -10,6 +10,7 @@ import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import PaymentCallback from "@/pages/PaymentCallback";
 import Admin from "@/pages/Admin";
 import Occasions from "@/pages/Occasions";
 import Collections from "@/pages/Collections";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/product/:id" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/payment-callback" component={PaymentCallback} />
       <Route path="/categories" component={Products} />
       <Route path="/new-arrivals" component={NewArrivals} />
       <Route path="/trending-collection" component={TrendingCollection} />

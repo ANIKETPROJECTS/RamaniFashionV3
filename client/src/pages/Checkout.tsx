@@ -60,15 +60,40 @@ export default function Checkout() {
 
   const createOrderMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/orders", "POST", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
-      toast({ title: "Order placed successfully!" });
-      setLocation("/orders");
+    onSuccess: (data: any) => {
+      if (paymentMethod === "phonepe") {
+        initiatePhonePePayment(data._id, total);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+        toast({ title: "Order placed successfully!" });
+        setLocation("/orders");
+      }
     },
     onError: () => {
       toast({ title: "Please login to place order", variant: "destructive" });
     },
   });
+
+  const phonePePaymentMutation = useMutation({
+    mutationFn: (data: { orderId: string; amount: number }) => 
+      apiRequest("/api/payment/phonepe/initiate", "POST", data),
+    onSuccess: (data: any) => {
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Payment initiation failed", 
+        description: error.message || "Please try again",
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const initiatePhonePePayment = (orderId: string, amount: number) => {
+    phonePePaymentMutation.mutate({ orderId, amount });
+  };
 
   const items = (cart as any)?.items || [];
   const subtotal = items.reduce((sum: number, item: any) => {
@@ -282,9 +307,9 @@ export default function Checkout() {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 p-3 border rounded-md hover-elevate">
-                    <RadioGroupItem value="online" id="online" data-testid="radio-online" />
-                    <Label htmlFor="online" className="flex-1 cursor-pointer">
-                      Online Payment (Coming Soon)
+                    <RadioGroupItem value="phonepe" id="phonepe" data-testid="radio-phonepe" />
+                    <Label htmlFor="phonepe" className="flex-1 cursor-pointer">
+                      PhonePe / UPI / Cards / Net Banking
                     </Label>
                   </div>
                 </RadioGroup>
