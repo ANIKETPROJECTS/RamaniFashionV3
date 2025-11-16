@@ -174,6 +174,11 @@ const orderSchema = new Schema({
   paymentMethod: { type: String, required: true },
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
   orderStatus: { type: String, enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], default: 'pending' },
+  phonePeTransactionId: { type: String },
+  phonePeMerchantOrderId: { type: String },
+  phonePeOrderId: { type: String },
+  phonePePaymentState: { type: String },
+  phonePePaymentDetails: { type: Schema.Types.Mixed },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
