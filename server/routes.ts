@@ -1633,24 +1633,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/orders/:id/approve", authenticateAdmin, async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.id);
+      
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      if (order.approved) {
+        return res.status(400).json({ error: 'Order already approved' });
+      }
+
+      order.approved = true;
+      order.approvedBy = req.admin.username;
+      order.approvedAt = new Date();
+      order.orderStatus = 'approved';
+      order.updatedAt = new Date();
+      
+      await order.save();
+
+      const populatedOrder = await Order.findById(order._id)
+        .populate('userId', 'name email phone')
+        .lean();
+
+      res.json(populatedOrder);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.put("/api/admin/orders/:id/status", authenticateAdmin, async (req, res) => {
     try {
       const { orderStatus, paymentStatus } = req.body;
+      const order = await Order.findById(req.params.id);
+      
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      if (orderStatus === 'processing' || orderStatus === 'shipped') {
+        if (!order.approved) {
+          return res.status(400).json({ 
+            error: 'Order must be approved before it can be processed or shipped' 
+          });
+        }
+      }
+
       const updateData: any = { updatedAt: new Date() };
       
       if (orderStatus) updateData.orderStatus = orderStatus;
       if (paymentStatus) updateData.paymentStatus = paymentStatus;
 
-      const order = await Order.findByIdAndUpdate(
+      const updatedOrder = await Order.findByIdAndUpdate(
         req.params.id,
         updateData,
         { new: true }
       ).populate('userId', 'name email phone');
       
-      if (!order) {
-        return res.status(404).json({ error: 'Order not found' });
-      }
-      res.json(order);
+      res.json(updatedOrder);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
