@@ -79,7 +79,16 @@ export default function Checkout() {
       apiRequest("/api/payment/phonepe/initiate", "POST", data),
     onSuccess: (data: any) => {
       if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+        if (import.meta.env.DEV) {
+          window.open(data.redirectUrl, '_blank', 'noopener,noreferrer');
+          setLocation(`/payment-callback?merchantOrderId=${data.merchantOrderId}`);
+          toast({
+            title: "Test Mode Active",
+            description: "PhonePe opened in new tab. Use the test buttons to simulate payment outcome.",
+          });
+        } else {
+          window.location.href = data.redirectUrl;
+        }
       }
     },
     onError: (error: any) => {
