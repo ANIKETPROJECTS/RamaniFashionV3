@@ -79,16 +79,16 @@ export default function PaymentCallback() {
                     Please wait while we verify your payment...
                   </p>
                 </div>
-                {isDevelopment && merchantOrderId && !isLoading && (
+                {isDevelopment && merchantOrderId && (
                   <div className="mt-4 p-4 border border-orange-500 rounded-md bg-orange-50 dark:bg-orange-950/20">
                     <div className="flex items-start gap-2 mb-3">
                       <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-orange-800 dark:text-orange-200 mb-1">
-                          Test Mode - Sandbox Payment Stuck?
+                          Test Mode - Sandbox Payment
                         </p>
                         <p className="text-xs text-orange-700 dark:text-orange-300 mb-3">
-                          PhonePe sandbox payments don't auto-complete. Use these buttons to simulate payment outcome:
+                          PhonePe sandbox payments don't auto-complete. Close the PhonePe tab and use these buttons to simulate the payment outcome:
                         </p>
                       </div>
                     </div>
