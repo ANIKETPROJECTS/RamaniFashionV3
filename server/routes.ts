@@ -819,32 +819,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { merchantOrderId } = req.params;
 
-      const statusResponse = await phonePeService.checkOrderStatus(merchantOrderId);
-
-      if (!statusResponse.success) {
-        return res.status(500).json({ error: statusResponse.error || 'Failed to check payment status' });
+      const order = await Order.findOne({ phonePeMerchantOrderId: merchantOrderId });
+      
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
       }
 
-      const order = await Order.findOne({ phonePeMerchantOrderId: merchantOrderId });
-      if (order) {
-        const paymentStatus = statusResponse.state === 'COMPLETED' ? 'paid' : 
-                             statusResponse.state === 'FAILED' ? 'failed' : 'pending';
-        
-        await Order.findByIdAndUpdate(order._id, {
-          phonePePaymentState: statusResponse.state,
-          phonePePaymentDetails: statusResponse.paymentDetails,
-          paymentStatus,
-          orderStatus: paymentStatus === 'paid' ? 'processing' : order.orderStatus,
-          updatedAt: new Date(),
+      if (order.userId.toString() !== (req as any).user.userId) {
+        return res.status(403).json({ error: 'Unauthorized access to order' });
+      }
+
+      if (order.phonePePaymentState && (order.phonePePaymentState === 'COMPLETED' || order.phonePePaymentState === 'FAILED')) {
+        return res.json({
+          success: true,
+          state: order.phonePePaymentState,
+          orderId: order.phonePeOrderId,
+          amount: order.total * 100,
+          paymentDetails: order.phonePePaymentDetails || {},
         });
       }
 
-      res.json({
+      try {
+        const statusResponse = await phonePeService.checkOrderStatus(merchantOrderId);
+
+        if (statusResponse.success) {
+          const paymentStatus = statusResponse.state === 'COMPLETED' ? 'paid' : 
+                               statusResponse.state === 'FAILED' ? 'failed' : 'pending';
+          
+          await Order.findByIdAndUpdate(order._id, {
+            phonePePaymentState: statusResponse.state,
+            phonePePaymentDetails: statusResponse.paymentDetails,
+            paymentStatus,
+            orderStatus: paymentStatus === 'paid' ? 'processing' : order.orderStatus,
+            updatedAt: new Date(),
+          });
+
+          return res.json({
+            success: true,
+            state: statusResponse.state,
+            orderId: statusResponse.orderId,
+            amount: statusResponse.amount,
+            paymentDetails: statusResponse.paymentDetails,
+          });
+        }
+      } catch (phonePeError) {
+        console.log('PhonePe SDK error (expected in sandbox):', phonePeError);
+      }
+
+      return res.json({
         success: true,
-        state: statusResponse.state,
-        orderId: statusResponse.orderId,
-        amount: statusResponse.amount,
-        paymentDetails: statusResponse.paymentDetails,
+        state: order.phonePePaymentState || 'PENDING',
+        orderId: order.phonePeOrderId,
+        amount: order.total * 100,
+        paymentDetails: order.phonePePaymentDetails || {},
       });
     } catch (error: any) {
       console.error('PhonePe status check error:', error);
