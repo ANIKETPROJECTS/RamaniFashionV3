@@ -152,8 +152,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const products = await Product.aggregate(pipeline);
         const total = await Product.countDocuments(query);
 
+        // Flatten products with color variants into separate cards
+        const flattenedProducts = products.flatMap((product: any) => {
+          if (product.colorVariants && product.colorVariants.length > 0) {
+            return product.colorVariants.map((variant: any, index: number) => ({
+              ...product,
+              _id: `${product._id}_variant_${index}`,
+              baseProductId: product._id,
+              variantIndex: index,
+              displayColor: variant.color,
+              displayImages: variant.images && variant.images.length > 0 ? variant.images : product.images,
+              variantStockQuantity: variant.stockQuantity,
+              variantInStock: variant.inStock,
+            }));
+          }
+          return [product];
+        });
+
         res.json({
-          products,
+          products: flattenedProducts,
           pagination: {
             page: pageNum,
             limit: limitNum,
@@ -174,8 +191,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const total = await Product.countDocuments(query);
 
+        // Flatten products with color variants into separate cards
+        const flattenedProducts = products.flatMap((product: any) => {
+          if (product.colorVariants && product.colorVariants.length > 0) {
+            return product.colorVariants.map((variant: any, index: number) => ({
+              ...product,
+              _id: `${product._id}_variant_${index}`,
+              baseProductId: product._id,
+              variantIndex: index,
+              displayColor: variant.color,
+              displayImages: variant.images && variant.images.length > 0 ? variant.images : product.images,
+              variantStockQuantity: variant.stockQuantity,
+              variantInStock: variant.inStock,
+            }));
+          }
+          return [product];
+        });
+
         res.json({
-          products,
+          products: flattenedProducts,
           pagination: {
             page: pageNum,
             limit: limitNum,

@@ -56,7 +56,10 @@ export default function ProductDetail() {
       );
       if (!response.ok) return [];
       const data = await response.json();
-      return data.products?.filter((p: any) => p._id !== id).slice(0, 8) || [];
+      return data.products?.filter((p: any) => {
+        const productId = p.baseProductId || p._id;
+        return productId !== id;
+      }).slice(0, 8) || [];
     },
     enabled: !!product?.category,
   });

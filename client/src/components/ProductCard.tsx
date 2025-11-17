@@ -23,6 +23,8 @@ const prefetchProduct = async (productId: string) => {
 
 interface ProductCardProps {
   id: string;
+  baseProductId?: string;
+  displayColor?: string;
   name: string;
   image: string;
   secondaryImage?: string;
@@ -42,6 +44,8 @@ interface ProductCardProps {
 
 export default function ProductCard({
   id,
+  baseProductId,
+  displayColor,
   name,
   image,
   secondaryImage,
@@ -63,6 +67,8 @@ export default function ProductCard({
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { openLogin } = useAuthUI();
+  
+  const productDetailId = baseProductId || id;
 
   const addToCartMutation = useMutation({
     mutationFn: (data: any) => apiRequest("/api/cart", "POST", data),
@@ -73,7 +79,7 @@ export default function ProductCard({
     onError: () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        localStorageService.addToCart(id, 1);
+        localStorageService.addToCart(cartProductId, 1, displayColor);
         queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
         toast({ title: "Added to cart successfully!" });
       } else {
@@ -91,7 +97,7 @@ export default function ProductCard({
     onError: () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        localStorageService.addToWishlist(id);
+        localStorageService.addToWishlist(cartProductId);
         queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
         toast({ title: "Added to wishlist!" });
       } else {
@@ -111,13 +117,15 @@ export default function ProductCard({
     },
   });
 
+  const cartProductId = baseProductId || id;
+  
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
     if (onAddToWishlist) {
       onAddToWishlist();
     } else {
-      addToWishlistMutation.mutate(id);
+      addToWishlistMutation.mutate(cartProductId);
     }
   };
 
@@ -126,7 +134,11 @@ export default function ProductCard({
     if (onAddToCart) {
       onAddToCart();
     } else {
-      addToCartMutation.mutate({ productId: id, quantity: 1 });
+      addToCartMutation.mutate({ 
+        productId: cartProductId, 
+        quantity: 1,
+        selectedColor: displayColor 
+      });
     }
   };
 
@@ -141,16 +153,24 @@ export default function ProductCard({
         openLogin();
         return;
       }
-      buyNowMutation.mutate({ productId: id, quantity: 1 });
+      buyNowMutation.mutate({ 
+        productId: cartProductId, 
+        quantity: 1,
+        selectedColor: displayColor 
+      });
     }
   };
 
+  const testId = baseProductId 
+    ? `card-product-${baseProductId}-variant-${id.split('_variant_')[1] || '0'}`
+    : `card-product-${id}`;
+  
   return (
     <Card 
       className="overflow-hidden cursor-pointer hover-elevate active-elevate-2 group"
-      onClick={() => onClick ? onClick() : setLocation(`/product/${id}`)}
-      onMouseEnter={() => prefetchProduct(id)}
-      data-testid={`card-product-${id}`}
+      onClick={() => onClick ? onClick() : setLocation(`/product/${productDetailId}`)}
+      onMouseEnter={() => prefetchProduct(productDetailId)}
+      data-testid={testId}
     >
       <div className="relative aspect-[3/5] overflow-hidden">
         <img

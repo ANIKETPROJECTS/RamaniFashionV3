@@ -462,7 +462,7 @@ export default function TrendingCollection() {
                       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
                       : 0;
                     
-                    const preferredVariantIndex = colorPreferences.getPreferredVariantIndex(product._id, product);
+                    const displayImages = product.displayImages || product.images || [];
                     
                     return (
                       <motion.div
@@ -477,9 +477,11 @@ export default function TrendingCollection() {
                       >
                         <ProductCard
                           id={product._id}
+                          baseProductId={product.baseProductId}
+                          displayColor={product.displayColor}
                           name={product.name}
-                          image={product.colorVariants?.[preferredVariantIndex]?.images?.[0] || product.images?.[0] || "/placeholder.jpg"}
-                          secondaryImage={product.colorVariants?.[preferredVariantIndex]?.images?.[1] || product.images?.[1]}
+                          image={displayImages[0] || "/placeholder.jpg"}
+                          secondaryImage={displayImages[1]}
                           price={product.price}
                           originalPrice={product.originalPrice}
                           discount={discount}
