@@ -31,7 +31,11 @@ export const localStorageService = {
   addToCart(productId: string, quantity: number = 1, selectedColor?: string): void {
     const cart = this.getCart();
     const existingItem = cart.items.find(
-      item => item.productId === productId && item.selectedColor === selectedColor
+      item => {
+        const productMatch = item.productId === productId;
+        const colorMatch = (item.selectedColor || undefined) === (selectedColor || undefined);
+        return productMatch && colorMatch;
+      }
     );
     
     if (existingItem) {
@@ -46,7 +50,11 @@ export const localStorageService = {
   updateCartQuantity(productId: string, quantity: number, selectedColor?: string): void {
     const cart = this.getCart();
     const item = cart.items.find(
-      item => item.productId === productId && item.selectedColor === selectedColor
+      item => {
+        const productMatch = item.productId === productId;
+        const colorMatch = (item.selectedColor || undefined) === (selectedColor || undefined);
+        return productMatch && colorMatch;
+      }
     );
     
     if (item) {
@@ -58,7 +66,11 @@ export const localStorageService = {
   removeFromCart(productId: string, selectedColor?: string): void {
     const cart = this.getCart();
     cart.items = cart.items.filter(
-      item => !(item.productId === productId && item.selectedColor === selectedColor)
+      item => {
+        const productMatch = item.productId === productId;
+        const colorMatch = (item.selectedColor || undefined) === (selectedColor || undefined);
+        return !(productMatch && colorMatch);
+      }
     );
     this.setCart(cart);
   },

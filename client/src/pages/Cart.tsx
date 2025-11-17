@@ -69,6 +69,10 @@ export default function Cart() {
         fetchProducts();
       }
     },
+    onError: (error) => {
+      console.error("Error updating cart quantity:", error);
+      toast({ title: "Failed to update quantity", variant: "destructive" });
+    },
   });
 
   const removeItemMutation = useMutation({
@@ -96,6 +100,10 @@ export default function Cart() {
         fetchProducts();
       }
       toast({ title: "Item removed from cart" });
+    },
+    onError: (error) => {
+      console.error("Error removing item from cart:", error);
+      toast({ title: "Failed to remove item", variant: "destructive" });
     },
   });
 
