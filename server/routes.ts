@@ -1983,14 +1983,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selling_price: item.price,
         discount: 0,
         tax: 0,
-        hsn: 0
+        hsn: 5208
       }));
 
       const totalWeight = order.items.reduce((sum: number, item: any) => sum + (item.quantity * 0.5), 0);
 
+      const now = new Date();
+      const orderDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
       const shiprocketOrderData = {
         order_id: order.orderNumber,
-        order_date: new Date().toISOString().split('T')[0],
+        order_date: orderDate,
         pickup_location: "Primary",
         billing_customer_name: firstName,
         billing_last_name: lastName,
