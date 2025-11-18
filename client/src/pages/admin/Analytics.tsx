@@ -42,15 +42,24 @@ export default function Analytics() {
   const [location, setLocation] = useLocation();
   const adminToken = localStorage.getItem("adminToken");
 
-  const { data: customers, isLoading: loadingCustomers } = useQuery({
+  const { data: customersData, isLoading: loadingCustomers } = useQuery<{
+    customers: any[];
+    pagination: any;
+  }>({
     queryKey: ["/api/admin/customers"],
     enabled: !!adminToken
   });
 
-  const { data: orders, isLoading: loadingOrders } = useQuery({
+  const { data: ordersData, isLoading: loadingOrders } = useQuery<{
+    orders: any[];
+    pagination: any;
+  }>({
     queryKey: ["/api/admin/orders"],
     enabled: !!adminToken
   });
+
+  const customers = customersData?.customers || [];
+  const orders = ordersData?.orders || [];
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -91,8 +100,8 @@ export default function Analytics() {
     { month: 'Jun', completed: 175, pending: 28, cancelled: 7 },
   ];
 
-  const avgOrderValue = orders?.length 
-    ? Math.round(orders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0) / orders.length)
+  const avgOrderValue = orders.length 
+    ? Math.round(orders.reduce((sum: number, o: any) => sum + (o.total || o.totalAmount || 0), 0) / orders.length)
     : 0;
 
   return (
@@ -176,7 +185,7 @@ export default function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-total-customers">
-                      {customers?.length || 0}
+                      {customers.length}
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center">
                       <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
@@ -194,7 +203,7 @@ export default function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1" data-testid="text-total-orders-analytics">
-                      {orders?.length || 0}
+                      {orders.length}
                     </div>
                     <p className="text-xs text-muted-foreground flex items-center">
                       <ArrowUpRight className="h-3 w-3 text-green-600 mr-1" />
@@ -311,7 +320,7 @@ export default function Analytics() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {customers?.map((customer: any) => (
+                        {customers.map((customer: any) => (
                           <TableRow 
                             key={customer._id} 
                             data-testid={`row-customer-${customer._id}`}
@@ -321,16 +330,16 @@ export default function Analytics() {
                             <TableCell className="text-muted-foreground">{customer.email}</TableCell>
                             <TableCell>
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400">
-                                {customer.totalOrders || 0}
+                                {customer.stats?.totalOrders || customer.totalOrders || 0}
                               </span>
                             </TableCell>
                             <TableCell className="font-semibold text-pink-600 dark:text-pink-400">
-                              ₹{customer.totalSpent?.toLocaleString() || 0}
+                              ₹{(customer.stats?.totalSpent || customer.totalSpent || 0).toLocaleString()}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
                                 <Heart className="h-4 w-4 text-pink-500 mr-1" />
-                                <span>{customer.wishlistCount || 0}</span>
+                                <span>{customer.stats?.wishlistCount || customer.wishlistCount || 0}</span>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -360,7 +369,7 @@ export default function Analytics() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {orders?.slice(0, 10).map((order: any) => (
+                        {orders.slice(0, 10).map((order: any) => (
                           <TableRow 
                             key={order._id} 
                             data-testid={`row-order-${order._id}`}
@@ -371,11 +380,11 @@ export default function Analytics() {
                               {order.userId?.name || order.userId?.email || 'N/A'}
                             </TableCell>
                             <TableCell className="font-semibold text-pink-600 dark:text-pink-400">
-                              ₹{order.totalAmount?.toLocaleString()}
+                              ₹{(order.total || order.totalAmount || 0).toLocaleString()}
                             </TableCell>
                             <TableCell>
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                {order.status || 'pending'}
+                                {order.orderStatus || order.status || 'pending'}
                               </span>
                             </TableCell>
                             <TableCell className="text-muted-foreground">

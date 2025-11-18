@@ -2049,6 +2049,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/admin/reviews", authenticateAdmin, async (req, res) => {
+    try {
+      const {
+        search,
+        productId,
+        rating,
+        verifiedOnly,
+        sort = 'createdAt',
+        order = 'desc',
+        page = '1',
+        limit = '50'
+      } = req.query;
+
+      const query: any = {};
+
+      if (productId) {
+        query.productId = productId;
+      }
+
+      if (rating) {
+        query.rating = parseInt(rating as string);
+      }
+
+      if (verifiedOnly === 'true') {
+        query.verifiedPurchase = true;
+      }
+
+      if (search) {
+        const searchRegex = new RegExp(search as string, 'i');
+        query.$or = [
+          { customerName: searchRegex },
+          { title: searchRegex },
+          { comment: searchRegex }
+        ];
+      }
+
+      const pageNum = parseInt(page as string);
+      const limitNum = Math.min(parseInt(limit as string), 100);
+      const skip = (pageNum - 1) * limitNum;
+
+      const sortObj: any = {};
+      sortObj[sort as string] = order === 'asc' ? 1 : -1;
+
+      const total = await Review.countDocuments(query);
+
+      const reviews = await Review.find(query)
+        .populate('productId', 'name images category price')
+        .populate('customerId', 'name email phone')
+        .sort(sortObj)
+        .skip(skip)
+        .limit(limitNum)
+        .lean();
+
+      // Calculate aggregate statistics across ALL matching reviews (not just current page)
+      const allReviews = await Review.find(query).select('rating verifiedPurchase helpful').lean();
+      const verifiedCount = allReviews.filter(r => r.verifiedPurchase).length;
+      const avgRating = allReviews.length > 0 
+        ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length 
+        : 0;
+      const totalHelpful = allReviews.reduce((sum, r) => sum + (r.helpful || 0), 0);
+
+      res.json({
+        reviews,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: Math.ceil(total / limitNum)
+        },
+        stats: {
+          totalReviews: total,
+          verifiedPurchases: verifiedCount,
+          averageRating: avgRating,
+          totalHelpfulVotes: totalHelpful
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/admin/reviews/:id", authenticateAdmin, async (req, res) => {
+    try {
+      const review = await Review.findByIdAndDelete(req.params.id);
+      
+      if (!review) {
+        return res.status(404).json({ error: 'Review not found' });
+      }
+
+      res.json({ success: true, message: 'Review deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

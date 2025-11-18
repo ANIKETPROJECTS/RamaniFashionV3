@@ -28,6 +28,7 @@ import ProductManagement from "@/pages/admin/ProductManagement";
 import InventoryManagement from "@/pages/admin/InventoryManagement";
 import OrderManagement from "@/pages/admin/OrderManagement";
 import CustomerManagement from "@/pages/admin/CustomerManagement";
+import ReviewManagement from "@/pages/admin/ReviewManagement";
 import Analytics from "@/pages/admin/Analytics";
 import Settings from "@/pages/admin/Settings";
 
@@ -57,6 +58,7 @@ function Router() {
       <Route path="/admin/inventory" component={InventoryManagement} />
       <Route path="/admin/orders" component={OrderManagement} />
       <Route path="/admin/customers" component={CustomerManagement} />
+      <Route path="/admin/reviews" component={ReviewManagement} />
       <Route path="/admin/analytics" component={Analytics} />
       <Route path="/admin/settings" component={Settings} />
       <Route component={NotFound} />

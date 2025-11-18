@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   ShoppingBag,
-  Users
+  Users,
+  Star
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -43,6 +44,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: "/admin/inventory", label: "Inventory", icon: Warehouse },
     { path: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { path: "/admin/customers", label: "Customers", icon: Users },
+    { path: "/admin/reviews", label: "Reviews", icon: Star },
     { path: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
