@@ -1967,9 +1967,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Order already approved' });
       }
 
-      if (order.paymentStatus !== 'paid') {
+      if (order.paymentMethod !== 'cod' && order.paymentStatus !== 'paid') {
         console.error('❌ Payment not completed. Payment status:', order.paymentStatus);
-        return res.status(400).json({ error: 'Payment must be completed before approving order' });
+        return res.status(400).json({ error: 'Prepaid orders must have payment completed before approval' });
       }
 
       const nameParts = order.shippingAddress.fullName.split(' ');

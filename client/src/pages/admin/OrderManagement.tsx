@@ -113,15 +113,9 @@ export default function OrderManagement() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
-  // Status update dialog
-  const [updatingOrder, setUpdatingOrder] = useState<Order | null>(null);
-  const [newOrderStatus, setNewOrderStatus] = useState("");
-  const [newPaymentStatus, setNewPaymentStatus] = useState("");
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-
-  // Reject dialog
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  // Rejection reason state (shown inline)
   const [rejectionReason, setRejectionReason] = useState("");
+  const [showRejectionInput, setShowRejectionInput] = useState(false);
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -180,25 +174,8 @@ export default function OrderManagement() {
       toast({ title: "Order rejected successfully!" });
       setDetailDialogOpen(false);
       setSelectedOrder(null);
-      setRejectDialogOpen(false);
       setRejectionReason("");
-    },
-    onError: (error: any) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: ({ id, orderStatus, paymentStatus }: any) => 
-      apiRequest(`/api/admin/orders/${id}/status`, "PUT", { 
-        orderStatus, 
-        paymentStatus 
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
-      toast({ title: "Order status updated successfully!" });
-      setStatusDialogOpen(false);
-      setUpdatingOrder(null);
+      setShowRejectionInput(false);
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -215,19 +192,18 @@ export default function OrderManagement() {
     }
   };
 
-  const handleUpdateStatus = (order: Order) => {
-    setUpdatingOrder(order);
-    setNewOrderStatus(order.orderStatus);
-    setNewPaymentStatus(order.paymentStatus);
-    setStatusDialogOpen(true);
-  };
-
-  const submitStatusUpdate = () => {
-    if (!updatingOrder) return;
-    updateStatusMutation.mutate({
-      id: updatingOrder._id,
-      orderStatus: newOrderStatus,
-      paymentStatus: newPaymentStatus
+  const handleRejectOrder = () => {
+    if (!selectedOrder || !rejectionReason.trim()) {
+      toast({ 
+        title: "Error", 
+        description: "Please provide a rejection reason", 
+        variant: "destructive" 
+      });
+      return;
+    }
+    rejectOrderMutation.mutate({ 
+      orderId: selectedOrder._id, 
+      reason: rejectionReason 
     });
   };
 
@@ -570,25 +546,15 @@ export default function OrderManagement() {
                         {format(new Date(order.createdAt), 'dd MMM yyyy')}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewDetails(order._id)}
-                            data-testid={`button-view-${order._id}`}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleUpdateStatus(order)}
-                            data-testid={`button-update-${order._id}`}
-                          >
-                            Update
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(order._id)}
+                          data-testid={`button-view-${order._id}`}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -658,25 +624,16 @@ export default function OrderManagement() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2">
+                  <div className="pt-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1"
+                      className="w-full"
                       onClick={() => handleViewDetails(order._id)}
                       data-testid={`button-card-view-${order._id}`}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       View Details
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUpdateStatus(order)}
-                      data-testid={`button-card-update-${order._id}`}
-                    >
-                      Update Status
                     </Button>
                   </div>
                 </CardContent>
@@ -911,132 +868,60 @@ export default function OrderManagement() {
                 )}
 
                 {!selectedOrder.approved && selectedOrder.orderStatus === 'pending' && (
-                  <div className="flex gap-2 pt-4 border-t">
-                    <Button
-                      onClick={() => approveOrderMutation.mutate(selectedOrder._id)}
-                      disabled={approveOrderMutation.isPending || selectedOrder.paymentStatus !== 'paid'}
-                      className="flex-1"
-                      data-testid="button-approve-order"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      {approveOrderMutation.isPending ? 'Approving...' : 'Approve & Send to Shiprocket'}
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => setRejectDialogOpen(true)}
-                      disabled={rejectOrderMutation.isPending}
-                      className="flex-1"
-                      data-testid="button-reject-order"
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Reject Order
-                    </Button>
-                  </div>
-                )}
-                {selectedOrder.paymentStatus !== 'paid' && selectedOrder.orderStatus === 'pending' && !selectedOrder.approved && (
-                  <div className="text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 p-3 rounded-md">
-                    ⚠️ Payment must be completed before approving the order
+                  <div className="space-y-3 pt-4 border-t">
+                    {selectedOrder.paymentMethod !== 'cod' && selectedOrder.paymentStatus !== 'paid' && (
+                      <div className="text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 p-3 rounded-md">
+                        ⚠️ Prepaid orders must have payment completed before approval
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => approveOrderMutation.mutate(selectedOrder._id)}
+                        disabled={approveOrderMutation.isPending || (selectedOrder.paymentMethod !== 'cod' && selectedOrder.paymentStatus !== 'paid')}
+                        className="flex-1"
+                        data-testid="button-approve-order"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        {approveOrderMutation.isPending ? 'Approving...' : 'Approve & Send to Shiprocket'}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowRejectionInput(!showRejectionInput)}
+                        disabled={rejectOrderMutation.isPending}
+                        className="flex-1"
+                        data-testid="button-reject-order"
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        {showRejectionInput ? 'Cancel' : 'Reject Order'}
+                      </Button>
+                    </div>
+
+                    {showRejectionInput && (
+                      <div className="space-y-2">
+                        <Label htmlFor="rejectionReason">Reason for Rejection</Label>
+                        <Input
+                          id="rejectionReason"
+                          placeholder="Enter reason for rejecting this order..."
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                          data-testid="input-rejection-reason"
+                        />
+                        <Button 
+                          variant="destructive"
+                          onClick={handleRejectOrder}
+                          disabled={rejectOrderMutation.isPending || !rejectionReason.trim()}
+                          className="w-full"
+                          data-testid="button-confirm-reject"
+                        >
+                          {rejectOrderMutation.isPending ? 'Rejecting...' : 'Confirm Rejection'}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Status Update Dialog */}
-        <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Update Order Status - {updatingOrder?.orderNumber}</DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="newOrderStatus">Order Status</Label>
-                <Select value={newOrderStatus} onValueChange={setNewOrderStatus}>
-                  <SelectTrigger id="newOrderStatus">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="newPaymentStatus">Payment Status</Label>
-                <Select value={newPaymentStatus} onValueChange={setNewPaymentStatus}>
-                  <SelectTrigger id="newPaymentStatus">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={submitStatusUpdate} disabled={updateStatusMutation.isPending}>
-                  {updateStatusMutation.isPending ? 'Updating...' : 'Update Status'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Reject Order Dialog */}
-        <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reject Order - {selectedOrder?.orderNumber}</DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="rejectionReason">Reason for Rejection</Label>
-                <Input
-                  id="rejectionReason"
-                  placeholder="Enter reason for rejecting this order..."
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  data-testid="input-rejection-reason"
-                />
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => {
-                  setRejectDialogOpen(false);
-                  setRejectionReason("");
-                }}>
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive"
-                  onClick={() => {
-                    if (selectedOrder) {
-                      rejectOrderMutation.mutate({
-                        orderId: selectedOrder._id,
-                        reason: rejectionReason
-                      });
-                    }
-                  }}
-                  disabled={rejectOrderMutation.isPending || !rejectionReason.trim()}
-                  data-testid="button-confirm-reject"
-                >
-                  {rejectOrderMutation.isPending ? 'Rejecting...' : 'Reject Order'}
-                </Button>
-              </div>
-            </div>
           </DialogContent>
         </Dialog>
       </div>
