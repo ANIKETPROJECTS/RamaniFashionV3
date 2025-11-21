@@ -31,6 +31,11 @@ import CustomerManagement from "@/pages/admin/CustomerManagement";
 import ReviewManagement from "@/pages/admin/ReviewManagement";
 import Analytics from "@/pages/admin/Analytics";
 import Settings from "@/pages/admin/Settings";
+import Privacy from "@/pages/Privacy";
+import Shipping from "@/pages/Shipping";
+import Returns from "@/pages/Returns";
+import FAQ from "@/pages/FAQ";
+import SizeGuide from "@/pages/SizeGuide";
 
 function Router() {
   return (
@@ -51,6 +56,13 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/orders" component={Orders} />
       <Route path="/wishlist" component={Wishlist} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Privacy} />
+      <Route path="/cookie-policy" component={Privacy} />
+      <Route path="/shipping" component={Shipping} />
+      <Route path="/returns" component={Returns} />
+      <Route path="/faq" component={FAQ} />
+      <Route path="/size-guide" component={SizeGuide} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
