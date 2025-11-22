@@ -86,12 +86,6 @@ export default function AdminLogin() {
               {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
           </form>
-          
-          <div className="mt-6 p-4 bg-muted rounded-md text-sm">
-            <p className="font-semibold mb-2">Demo Credentials:</p>
-            <p className="text-muted-foreground">Email: admin@ramanifashion.com</p>
-            <p className="text-muted-foreground">Password: admin123</p>
-          </div>
         </CardContent>
       </Card>
     </div>
