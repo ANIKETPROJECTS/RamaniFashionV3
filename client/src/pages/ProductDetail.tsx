@@ -592,7 +592,7 @@ export default function ProductDetail() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground space-y-2">
                 <p>Contact us for any queries or support.</p>
-                <p>Email: support@ramanifashion.com</p>
+                <p>Email: ramanifashion2024@gmail.com</p>
                 <p>Phone: +91 93724 94513</p>
                 <p>Available: Monday to Saturday, 10 AM - 6 PM</p>
               </AccordionContent>
