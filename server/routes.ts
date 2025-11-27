@@ -1104,24 +1104,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PhonePe redirect callback after payment
-  app.post("/payment-callback", async (req, res) => {
+  // PhonePe redirect callback after payment - handle both GET and POST
+  const handlePaymentCallback = async (req: any, res: any) => {
     try {
-      // PhonePe sends the response in the response field (base64 encoded)
-      const { response: base64Response } = req.body;
+      // PhonePe can send response in body (POST) or query params (GET)
+      const base64Response = req.body?.response || req.query?.response || req.body?.['response'];
+      const responseFromQuery = req.query?.response;
       
       let merchantOrderId = null;
       let paymentStatus = 'PENDING';
 
-      if (base64Response) {
+      console.log('Payment callback received - body:', req.body, 'query:', req.query);
+
+      // Try to parse the response
+      if (base64Response || responseFromQuery) {
         try {
-          const decodedResponse = Buffer.from(base64Response, 'base64').toString('utf-8');
+          const toParse = base64Response || responseFromQuery;
+          const decodedResponse = Buffer.from(toParse, 'base64').toString('utf-8');
           const paymentData = JSON.parse(decodedResponse);
           merchantOrderId = paymentData.merchantOrderId || paymentData.merchantTransactionId;
           paymentStatus = paymentData.state || 'PENDING';
-          console.log('PhonePe callback received - Order ID:', merchantOrderId, 'Status:', paymentStatus);
+          console.log('PhonePe callback parsed - Order ID:', merchantOrderId, 'Status:', paymentStatus);
         } catch (parseError) {
           console.error('Error parsing PhonePe response:', parseError);
+          // If we can't parse, just redirect to orders
+          paymentStatus = 'PENDING';
         }
       }
 
@@ -1135,7 +1142,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const frontendUrl = process.env.HOST_URL || 'https://ramanifashion.in';
       res.redirect(`${frontendUrl}/orders?paymentStatus=error`);
     }
-  });
+  };
+
+  app.post("/payment-callback", handlePaymentCallback);
+  app.get("/payment-callback", handlePaymentCallback);
 
   app.post("/api/payment/phonepe/webhook", async (req, res) => {
     try {
